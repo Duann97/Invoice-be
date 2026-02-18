@@ -2,13 +2,15 @@ import { NextFunction, Request, Response } from "express";
 import { ApiError } from "../utils/api-error.js";
 
 export const errorMiddleware = (
-  err: ApiError,
+  err: any,
   req: Request,
   res: Response,
-  next: NextFunction,
+  _next: NextFunction,
 ) => {
-  req.log.error(err.message);
-  const message = err.message || "Something went wrong!";
-  const status = err.status || 500;
-  res.status(status).send({ message });
+  req.log?.error?.(err);
+
+  const message = err?.message || "Something went wrong!";
+  const status = err?.status || err?.statusCode || 500;
+
+  return res.status(status).json({ message });
 };

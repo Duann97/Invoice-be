@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum RecurringFrequency {
+  DAILY
+  WEEKLY
+  MONTHLY
+  YEARLY
+}
+
+enum EmailStatus {
+  QUEUED
+  SENT
+  FAILED
+}
+
+model User {
+  id              String    @id @default(cuid())
+  email           String    @unique
+  passwordHash    String
+  isEmailVerified Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  payments        Payment[]
+
+  profile    UserProfile?
+  clients    Client[]
+  categories Category[]
+  products   Product[]
+  invoices   Invoice[]
+  recurring  RecurringInvoice[]
+}
+
+model UserProfile {
+  userId         String   @id
+  fullName       String?
+  phone          String?
+  companyName    String?
+  companyAddress String?
+  avatarUrl      String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Client {
+  id                String   @id @default(cuid())
+  userId            String
+  name              String
+  email             String?
+  phone             String?
+  address           String?
+  paymentPreference String?
+  notes             String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices  Invoice[]
+  recurring RecurringInvoice[]
+
+  @@index([userId])
+  @@index([name])
+}
+
+model Category {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([deletedAt])
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  userId      String
+  categoryId  String?
+  name        String
+  description String?
+  unitPrice   Decimal   @db.Decimal(18, 2)
+  unit        String?
+  imageUrl    String?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user     User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category?     @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  items    InvoiceItem[]
+
+  @@unique([userId, name])
+  @@index([userId])
+  @@index([categoryId])
+  @@index([deletedAt])
+}
+
+model Invoice {
+  id             String        @id @default(cuid())
+  userId         String
+  clientId       String
+  invoiceNumber  String
+  issueDate      DateTime
+  dueDate        DateTime
+  paymentTerms   String?
+  currency       String        @default("IDR")
+  status         InvoiceStatus @default(DRAFT)
+  subtotal       Decimal       @db.Decimal(18, 2)
+  taxAmount      Decimal       @default(0) @db.Decimal(18, 2)
+  discountAmount Decimal       @default(0) @db.Decimal(18, 2)
+  total          Decimal       @db.Decimal(18, 2)
+  notes          String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client              Client            @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  items               InvoiceItem[]
+  payments            Payment[]
+  emails              InvoiceEmail[]
+  recurringAsTemplate RecurringInvoice? @relation("RecurringTemplate")
+
+  @@unique([userId, invoiceNumber])
+  @@index([userId])
+  @@index([clientId])
+  @@index([status])
+  @@index([issueDate])
+  @@index([dueDate])
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  productId   String?
+  itemName    String
+  description String?
+  quantity    Decimal  @db.Decimal(18, 2)
+  unitPrice   Decimal  @db.Decimal(18, 2)
+  lineTotal   Decimal  @db.Decimal(18, 2)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  invoice Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([invoiceId])
+  @@index([productId])
+}
+
+model Payment {
+  id        String @id @default(cuid())
+  invoiceId String
+  userId    String
+
+  amount Decimal
+  paidAt DateTime @default(now())
+  notes  String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([userId])
+  @@index([userId, invoiceId])
+}
+
+model InvoiceEmail {
+  id           String      @id @default(cuid())
+  invoiceId    String
+  toEmail      String
+  subject      String
+  status       EmailStatus @default(QUEUED)
+  sentAt       DateTime?
+  errorMessage String?
+  createdAt    DateTime    @default(now())
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+  @@index([status])
+}
+
+model InvoiceCounter {
+  id        String   @id @default(cuid())
+  userId    String
+  period    String // "YYYYMM"
+  seq       Int      @default(0)
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, period])
+  @@index([userId, period])
+}
+
+model RecurringInvoice {
+  id                String             @id @default(cuid())
+  userId            String
+  clientId          String
+  templateInvoiceId String?            @unique
+  frequency         RecurringFrequency
+  interval          Int                @default(1)
+  startAt           DateTime
+  endAt             DateTime?
+  nextRunAt         DateTime
+  isActive          Boolean            @default(true)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+
+  templateInvoice Invoice? @relation("RecurringTemplate", fields: [templateInvoiceId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([clientId])
+  @@index([nextRunAt])
+  @@index([isActive])
+}

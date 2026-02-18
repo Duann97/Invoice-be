@@ -1,0 +1,129 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Invoice {{invoiceNumber}}</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        color: #111;
+      }
+      .container {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 16px;
+      }
+      .muted {
+        color: #666;
+        font-size: 12px;
+      }
+      .card {
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #eee;
+        padding: 10px;
+        text-align: left;
+        font-size: 13px;
+      }
+      th {
+        background: #f9fafb;
+      }
+      .right {
+        text-align: right;
+      }
+      .total {
+        font-size: 16px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Invoice {{invoiceNumber}}</h2>
+      <p class="muted">Status:
+        {{status}}
+        • Issue:
+        {{issueDate}}
+        • Due:
+        {{dueDate}}</p>
+
+      <div class="card">
+        <h3>Bill To</h3>
+        <p>
+          <strong>{{clientName}}</strong><br />
+          {{clientEmail}}<br />
+          {{clientPhone}}<br />
+          {{clientAddress}}
+        </p>
+
+        <h3>Items</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Item</th>
+              <th>Description</th>
+              <th class="right">Qty</th>
+              <th class="right">Unit Price</th>
+              <th class="right">Line Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each items}}
+              <tr>
+                <td>{{name}}</td>
+                <td>{{description}}</td>
+                <td class="right">{{quantity}}</td>
+                <td class="right">{{unitPrice}}</td>
+                <td class="right">{{lineTotal}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+
+        <table>
+          <tbody>
+            <tr>
+              <td class="right"><strong>Subtotal</strong></td>
+              <td class="right">{{subtotal}}</td>
+            </tr>
+            <tr>
+              <td class="right"><strong>Tax</strong></td>
+              <td class="right">{{taxAmount}}</td>
+            </tr>
+            <tr>
+              <td class="right"><strong>Discount</strong></td>
+              <td class="right">{{discountAmount}}</td>
+            </tr>
+            <tr>
+              <td class="right total">Total</td>
+              <td class="right total">{{total}}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        {{#if notes}}
+          <p><strong>Notes</strong><br />{{notes}}</p>
+        {{/if}}
+      </div>
+
+      <p class="muted" style="margin-top:12px;">
+        Sent by:
+        {{senderName}}
+        •
+        {{companyName}}
+        •
+        {{companyAddress}}
+        •
+        {{senderPhone}}
+      </p>
+    </div>
+  </body>
+</html>
