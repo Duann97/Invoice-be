@@ -26,7 +26,6 @@ export class ProductsService {
       include: { category: true },
     });
 
-    // kalau ada dan masih aktif -> tetap error
     if (existing && existing.deletedAt === null) {
       throw new ApiError("Product already exists", 400);
     }
