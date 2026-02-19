@@ -1,20 +1,27 @@
-import type { VercelRequest, VercelResponse } from "@vercel/node";
-import { App } from "../src/app.js";
+import "reflect-metadata";
+import { App } from "./app.js";
+import { prisma } from "./lib/prisma.js";
+import { RecurringCron } from "./cron/recurring.cron.js";
 
-let server: any; // cache across invocations
+process.on("uncaughtException", (err) => {
+  console.error("UNCAUGHT EXCEPTION:", err);
+});
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
+process.on("unhandledRejection", (reason) => {
+  console.error("UNHANDLED REJECTION:", reason);
+});
+
+const main = async () => {
+  const app = new App();
+  app.start();
+
+  // ===== START RECURRING CRON =====
   try {
-    if (!server) {
-      const appInstance = new App();
-      server = appInstance.app; // express instance
-    }
-    return server(req as any, res as any);
+    const recurringCron = new RecurringCron(prisma);
+    recurringCron.start();
   } catch (err) {
-    console.error("[vercel handler error]", err);
-    return res.status(500).json({
-      message: "Server crashed",
-      error: err instanceof Error ? err.message : String(err),
-    });
+    console.error("[cron] Failed to start recurring cron:", err);
   }
-}
+};
+
+main();
