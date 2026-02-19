@@ -16,6 +16,25 @@ const toNum = (v: any) => {
 export class DashboardService {
   constructor(private prisma: PrismaClient) {}
 
+  private startOfToday = () => {
+    const now = new Date();
+    return new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate(),
+      0,
+      0,
+      0,
+      0,
+    );
+  };
+
+  private endOfToday = () => {
+    const d = this.startOfToday();
+    d.setHours(23, 59, 59, 999);
+    return d;
+  };
+
   getSummary = async (userId: string) => {
     const OUTSTANDING: InvoiceStatus[] = ["DRAFT", "SENT", "OVERDUE"];
 
@@ -24,6 +43,12 @@ export class DashboardService {
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
 
     const outstandingStatuses = OUTSTANDING.filter(Boolean) as InvoiceStatus[];
+
+    // ✅ for dueSoon/overdue logic
+    const todayStart = this.startOfToday();
+    const dueSoonEnd = new Date(todayStart);
+    dueSoonEnd.setDate(dueSoonEnd.getDate() + 7);
+    dueSoonEnd.setHours(23, 59, 59, 999);
 
     const [
       outstandingAgg,
@@ -34,6 +59,7 @@ export class DashboardService {
       recentPayments,
       dueSoonInvoices,
     ] = await Promise.all([
+      // total outstanding = sum total for DRAFT/SENT/OVERDUE
       this.prisma.invoice.aggregate({
         where: {
           userId,
@@ -42,6 +68,7 @@ export class DashboardService {
         _sum: { total: true },
       }),
 
+      // paid this month
       this.prisma.payment.aggregate({
         where: {
           userId,
@@ -53,6 +80,7 @@ export class DashboardService {
         _sum: { amount: true },
       }),
 
+      // invoices created this month
       this.prisma.invoice.count({
         where: {
           userId,
@@ -63,14 +91,20 @@ export class DashboardService {
         },
       }),
 
-      // overdue count
+      /**
+       * ✅ FIX: overdueCount based on dueDate (not only status in DB)
+       * Rule: dueDate < start of today AND status NOT PAID/CANCELLED
+       * We include DRAFT & SENT (and OVERDUE already naturally included, but not required)
+       */
       this.prisma.invoice.count({
         where: {
           userId,
-          status: "OVERDUE",
+          dueDate: { lt: todayStart },
+          status: { notIn: ["PAID", "CANCELLED"] as any },
         },
       }),
 
+      // recent invoices
       this.prisma.invoice.findMany({
         where: { userId },
         orderBy: { createdAt: "desc" },
@@ -85,6 +119,7 @@ export class DashboardService {
         },
       }),
 
+      // recent payments
       this.prisma.payment.findMany({
         where: { userId },
         orderBy: { paidAt: "desc" },
@@ -98,14 +133,18 @@ export class DashboardService {
         },
       }),
 
+      /**
+       * ✅ FIX: dueSoonInvoices should not be only SENT.
+       * Rule: dueDate between todayStart..dueSoonEnd AND status not PAID/CANCELLED
+       */
       this.prisma.invoice.findMany({
         where: {
           userId,
-          status: "SENT",
           dueDate: {
-            gte: now,
-            lte: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+            gte: todayStart,
+            lte: dueSoonEnd,
           },
+          status: { notIn: ["PAID", "CANCELLED"] as any },
         },
         orderBy: { dueDate: "asc" },
         take: 5,

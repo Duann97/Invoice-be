@@ -46,9 +46,15 @@ export class InvoicesService {
     return x;
   };
 
-  private shouldBeOverdue = (status: any, dueDate: any) => {
+  /**
+   * ✅ Derived overdue rule (for response/UI/KPI):
+   * - PAID/CANCELLED never overdue
+   * - If dueDate exists and already past end-of-day => overdue
+   * - Applies even if status is DRAFT (so UI can show overdue if due date passed)
+   */
+  private isOverdueDerived = (status: any, dueDate: any) => {
     const s = String(status ?? "").toUpperCase();
-    if (s !== "SENT") return false;
+    if (s === "PAID" || s === "CANCELLED") return false;
     if (!dueDate) return false;
 
     const due = new Date(dueDate);
@@ -57,28 +63,48 @@ export class InvoicesService {
     return new Date().getTime() > this.endOfDay(due).getTime();
   };
 
+  /**
+   * ✅ Sync to DB ONLY for SENT -> OVERDUE (safe),
+   * but return overdueIds for BOTH SENT & DRAFT (derived), so response can be patched.
+   */
   private syncOverdueForInvoices = async (
     userId: string,
     invoices: Array<{ id: string; status?: any; dueDate?: any }>,
   ) => {
     const overdueIds = invoices
-      .filter((inv) => this.shouldBeOverdue(inv.status, inv.dueDate))
+      .filter((inv) => this.isOverdueDerived(inv.status, inv.dueDate))
       .map((inv) => inv.id);
 
     if (overdueIds.length === 0) return overdueIds;
 
-    await this.prisma.invoice.updateMany({
-      where: {
-        userId,
-        id: { in: overdueIds },
-        status: "SENT",
-      },
-      data: { status: "OVERDUE" as any },
-    });
+    // only persist DB change for SENT invoices
+    const sentOverdueIds = invoices
+      .filter(
+        (inv) =>
+          String(inv.status ?? "").toUpperCase() === "SENT" &&
+          this.isOverdueDerived(inv.status, inv.dueDate),
+      )
+      .map((inv) => inv.id);
+
+    if (sentOverdueIds.length > 0) {
+      await this.prisma.invoice.updateMany({
+        where: {
+          userId,
+          id: { in: sentOverdueIds },
+          status: "SENT",
+        },
+        data: { status: "OVERDUE" as any },
+      });
+    }
 
     return overdueIds;
   };
 
+  /**
+   * ✅ For detail endpoint:
+   * - if SENT already overdue => update DB to OVERDUE
+   * - return whether it is overdue derived (so we can patch response)
+   */
   private syncOverdueForSingle = async (userId: string, id: string) => {
     const inv = await this.prisma.invoice.findFirst({
       where: { id, userId },
@@ -86,14 +112,18 @@ export class InvoicesService {
     });
     if (!inv) throw new ApiError("Invoice not found", 404);
 
-    if (!this.shouldBeOverdue(inv.status, inv.dueDate)) return false;
+    const overdue = this.isOverdueDerived(inv.status, inv.dueDate);
+    if (!overdue) return { overdue: false };
 
-    await this.prisma.invoice.update({
-      where: { id },
-      data: { status: "OVERDUE" as any },
-    });
+    const s = String(inv.status ?? "").toUpperCase();
+    if (s === "SENT") {
+      await this.prisma.invoice.update({
+        where: { id },
+        data: { status: "OVERDUE" as any },
+      });
+    }
 
-    return true;
+    return { overdue: true };
   };
 
   create = async (userId: string, body: CreateInvoiceDTO) => {
@@ -162,7 +192,7 @@ export class InvoicesService {
         },
         include: {
           client: true,
-          items: { include: { product: true } }, // ✅ include product
+          items: { include: { product: true } },
         },
       });
 
@@ -215,12 +245,13 @@ export class InvoicesService {
         take: limit,
         include: {
           client: true,
-          items: { include: { product: true } }, // ✅ include product
+          items: { include: { product: true } },
         },
       }),
       this.prisma.invoice.count({ where }),
     ]);
 
+    // ✅ patch overdue (DB sync for SENT only; response patch for SENT & DRAFT)
     const overdueIds = await this.syncOverdueForInvoices(
       userId,
       data.map((x: any) => ({
@@ -249,19 +280,25 @@ export class InvoicesService {
   };
 
   detail = async (userId: string, id: string) => {
-    await this.syncOverdueForSingle(userId, id);
+    const { overdue } = await this.syncOverdueForSingle(userId, id);
 
     const inv = await this.prisma.invoice.findFirst({
       where: { id, userId },
       include: {
         client: true,
-        items: { include: { product: true } }, // ✅ include product
+        items: { include: { product: true } },
         payments: true,
         emails: true,
       },
     });
 
     if (!inv) throw new ApiError("Invoice not found", 404);
+
+    // ✅ patch response for DRAFT overdue too
+    if (overdue) {
+      return { ...inv, status: "OVERDUE" as any };
+    }
+
     return inv;
   };
 
@@ -343,7 +380,7 @@ export class InvoicesService {
         },
         include: {
           client: true,
-          items: { include: { product: true } }, // ✅ include product
+          items: { include: { product: true } },
         },
       });
 
@@ -379,7 +416,7 @@ export class InvoicesService {
       where: { id, userId },
       include: {
         client: true,
-        items: { include: { product: true } }, // ✅ include product
+        items: { include: { product: true } },
         user: { include: { profile: true } },
       },
     });
@@ -456,7 +493,7 @@ export class InvoicesService {
         data: { status: "SENT" },
         include: {
           client: true,
-          items: { include: { product: true } }, // ✅ include product
+          items: { include: { product: true } },
           emails: true,
           payments: true,
         },
