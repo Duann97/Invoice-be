@@ -160,7 +160,10 @@ export class InvoicesService {
             })),
           },
         },
-        include: { client: true, items: true },
+        include: {
+          client: true,
+          items: { include: { product: true } }, // ✅ include product
+        },
       });
 
       return inv;
@@ -212,7 +215,7 @@ export class InvoicesService {
         take: limit,
         include: {
           client: true,
-          items: true,
+          items: { include: { product: true } }, // ✅ include product
         },
       }),
       this.prisma.invoice.count({ where }),
@@ -252,7 +255,7 @@ export class InvoicesService {
       where: { id, userId },
       include: {
         client: true,
-        items: true,
+        items: { include: { product: true } }, // ✅ include product
         payments: true,
         emails: true,
       },
@@ -338,7 +341,10 @@ export class InvoicesService {
           discountAmount,
           total,
         },
-        include: { client: true, items: true },
+        include: {
+          client: true,
+          items: { include: { product: true } }, // ✅ include product
+        },
       });
 
       return invUpdated;
@@ -373,7 +379,7 @@ export class InvoicesService {
       where: { id, userId },
       include: {
         client: true,
-        items: true,
+        items: { include: { product: true } }, // ✅ include product
         user: { include: { profile: true } },
       },
     });
@@ -410,7 +416,7 @@ export class InvoicesService {
         safeTrim(inv.user?.profile?.companyName) || "Invoice App";
 
       const items = (inv.items ?? []).map((it: any) => ({
-        name: it.itemName,
+        name: it.itemName || it.product?.name || "Item",
         description: it.description ?? "",
         qty: String(it.quantity),
         price: this.formatIDR(it.unitPrice),
@@ -448,7 +454,12 @@ export class InvoicesService {
       const updatedInvoice = await this.prisma.invoice.update({
         where: { id: inv.id },
         data: { status: "SENT" },
-        include: { client: true, items: true, emails: true, payments: true },
+        include: {
+          client: true,
+          items: { include: { product: true } }, // ✅ include product
+          emails: true,
+          payments: true,
+        },
       });
 
       return updatedInvoice;

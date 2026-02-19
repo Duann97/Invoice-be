@@ -119,6 +119,18 @@ export class RecurringService {
         );
       }
       templateInvoiceId = template.id;
+
+      // ✅ FIX: templateInvoiceId UNIQUE → cek dulu biar gak P2002
+      const exists = await this.prisma.recurringInvoice.findFirst({
+        where: { userId, templateInvoiceId },
+        select: { id: true },
+      });
+      if (exists) {
+        throw new ApiError(
+          "Recurring untuk template invoice ini sudah ada. Pilih template lain atau edit recurring yang sudah dibuat.",
+          400,
+        );
+      }
     }
 
     return await this.prisma.recurringInvoice.create({

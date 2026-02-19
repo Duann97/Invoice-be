@@ -7,15 +7,26 @@ export class ProfileService {
 
   constructor(private prisma: PrismaClient) {}
 
+  // ✅ helper: bikin response FE-friendly (address = companyAddress)
+  private toResponse(profile: any) {
+    if (!profile) return profile;
+    return {
+      ...profile,
+      address: profile.companyAddress ?? profile.address ?? null,
+    };
+  }
+
   async getOrCreate(userId: string) {
     const existing = await this.prisma.userProfile.findUnique({
       where: { userId },
     });
-    if (existing) return existing;
+    if (existing) return this.toResponse(existing);
 
-    return await this.prisma.userProfile.create({
+    const created = await this.prisma.userProfile.create({
       data: { userId },
     });
+
+    return this.toResponse(created);
   }
 
   async update(
@@ -23,7 +34,13 @@ export class ProfileService {
     dto: UpdateProfileDTO,
     avatarFile?: Express.Multer.File,
   ) {
-    const current = await this.getOrCreate(userId);
+    const currentRaw = await this.prisma.userProfile.findUnique({
+      where: { userId },
+    });
+
+    const current = currentRaw
+      ? currentRaw
+      : await this.prisma.userProfile.create({ data: { userId } });
 
     let avatarUrl = current.avatarUrl ?? undefined;
 
@@ -42,7 +59,8 @@ export class ProfileService {
       avatarUrl = uploadedUrl;
     }
 
-    return await this.prisma.userProfile.update({
+    // ✅ simpan ke field DB yang bener: companyAddress
+    const updated = await this.prisma.userProfile.update({
       where: { userId },
       data: {
         fullName: dto.fullName ?? current.fullName,
@@ -51,5 +69,8 @@ export class ProfileService {
         avatarUrl,
       },
     });
+
+    // ✅ balikkan dengan alias "address" biar FE kamu kebaca dan gak ilang pas refresh
+    return this.toResponse(updated);
   }
 }
