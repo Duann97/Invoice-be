@@ -1,36 +1,52 @@
+import { IsOptional, IsString, IsNumber, IsBoolean } from "class-validator";
 import { Transform } from "class-transformer";
-import {
-  IsOptional,
-  IsString,
-  MaxLength,
-  IsNumber,
-  Min,
-} from "class-validator";
+
+const toNumberOrUndefined = (v: any) => {
+  if (v === null || v === undefined || v === "") return undefined;
+  if (typeof v === "number") return Number.isFinite(v) ? v : undefined;
+
+  if (typeof v === "string") {
+    // support "1.000.000" / "1,000,000" / "IDR 1.000.000"
+    const cleaned = v.replace(/[^\d.-]/g, "");
+    if (!cleaned) return undefined;
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : undefined;
+  }
+
+  return undefined;
+};
 
 export class UpdateProductDTO {
   @IsOptional()
   @IsString()
-  @MaxLength(120)
   name?: string;
 
   @IsOptional()
   @IsString()
-  @MaxLength(500)
-  description?: string;
-
-  @IsOptional()
-  @Transform(({ value }) => (value === "" ? undefined : Number(value)))
-  @IsNumber()
-  @Min(0)
-  unitPrice?: number;
+  description?: string | null;
 
   @IsOptional()
   @IsString()
-  @MaxLength(30)
-  unit?: string;
+  unit?: string | null;
 
-  // allow set null (hapus category) bisa via empty string di FE
+  // ✅ field utama yang dipakai backend + list FE
+  @IsOptional()
+  @Transform(({ value }) => toNumberOrUndefined(value))
+  @IsNumber()
+  unitPrice?: number;
+
+  // ✅ backward compatibility kalau FE kirim "price"
+  @IsOptional()
+  @Transform(({ value }) => toNumberOrUndefined(value))
+  @IsNumber()
+  price?: number;
+
   @IsOptional()
   @IsString()
   categoryId?: string | null;
+
+  // kalau DTO kamu sebelumnya punya ini, biarin. kalau nggak ada pun gapapa.
+  @IsOptional()
+  @IsBoolean()
+  includeDeleted?: boolean;
 }

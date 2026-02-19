@@ -4,6 +4,23 @@ import { CreateProductDTO } from "./dto/create-product.dto.js";
 import { UpdateProductDTO } from "./dto/update-product.dto.js";
 import { GetProductsDTO } from "./dto/get-products.dto.js";
 
+const normalizePrice = (v: any) => {
+  if (v === null || v === undefined) return undefined;
+
+  if (typeof v === "number") {
+    return Number.isFinite(v) ? v : undefined;
+  }
+
+  if (typeof v === "string") {
+    const cleaned = v.replace(/[^\d.-]/g, "");
+    if (!cleaned) return undefined;
+    const n = Number(cleaned);
+    return Number.isFinite(n) ? n : undefined;
+  }
+
+  return undefined;
+};
+
 export class ProductsService {
   constructor(private prisma: PrismaClient) {}
 
@@ -123,6 +140,15 @@ export class ProductsService {
       if (dup) throw new ApiError("Product name already used", 400);
     }
 
+    // ✅ FIX: dukung payload "price" atau "unitPrice" + normalize string angka
+    const incomingPrice =
+      (body as any).unitPrice !== undefined
+        ? (body as any).unitPrice
+        : (body as any).price;
+
+    const normalizedUnitPrice =
+      incomingPrice !== undefined ? normalizePrice(incomingPrice) : undefined;
+
     const updated = await this.prisma.product.update({
       where: { id },
       data: {
@@ -130,8 +156,8 @@ export class ProductsService {
         ...(body.description !== undefined
           ? { description: body.description }
           : {}),
-        ...(body.unitPrice !== undefined
-          ? { unitPrice: body.unitPrice as any }
+        ...(normalizedUnitPrice !== undefined
+          ? { unitPrice: normalizedUnitPrice as any }
           : {}),
         ...(body.unit !== undefined ? { unit: body.unit } : {}),
         ...(body.categoryId !== undefined
