@@ -39,7 +39,31 @@ const addByFrequency = (
 export class RecurringService {
   constructor(private prisma: PrismaClient) {}
 
+  /**
+   * ✅ Paper-ish behavior:
+   * Always keep isActive consistent with endAt (cutoff).
+   * If now > endAt, rule is expired -> set isActive false.
+   *
+   * NOTE:
+   * - We intentionally only expire rules that are currently active.
+   * - This makes "list" always show correct status even if cron/job hasn't run.
+   */
+  private expireIfNeeded = async (userId: string) => {
+    const now = new Date();
+    await this.prisma.recurringInvoice.updateMany({
+      where: {
+        userId,
+        isActive: true,
+        endAt: { not: null, lt: now },
+      },
+      data: { isActive: false },
+    });
+  };
+
   list = async (userId: string, query: GetRecurringDTO) => {
+    // ✅ keep status fresh
+    await this.expireIfNeeded(userId);
+
     const page = clamp(toInt((query as any).page, 1), 1, 1_000_000);
     const limit = clamp(toInt((query as any).limit, 10), 1, 100);
     const skip = (page - 1) * limit;
@@ -105,6 +129,10 @@ export class RecurringService {
     if (nextRunAt < startAt)
       throw new ApiError("nextRunAt must be >= startAt", 400);
 
+    // ✅ If user sets endAt and nextRunAt already beyond endAt -> rule should be inactive
+    const initialActive =
+      (body.isActive ?? true) && (!endAt || nextRunAt <= endAt);
+
     let templateInvoiceId: string | null = null;
     if (body.templateInvoiceId) {
       const template = await this.prisma.invoice.findFirst({
@@ -119,18 +147,6 @@ export class RecurringService {
         );
       }
       templateInvoiceId = template.id;
-
-      // ✅ FIX: templateInvoiceId UNIQUE → cek dulu biar gak P2002
-      const exists = await this.prisma.recurringInvoice.findFirst({
-        where: { userId, templateInvoiceId },
-        select: { id: true },
-      });
-      if (exists) {
-        throw new ApiError(
-          "Recurring untuk template invoice ini sudah ada. Pilih template lain atau edit recurring yang sudah dibuat.",
-          400,
-        );
-      }
     }
 
     return await this.prisma.recurringInvoice.create({
@@ -143,7 +159,7 @@ export class RecurringService {
         startAt,
         endAt: endAt ?? undefined,
         nextRunAt,
-        isActive: body.isActive ?? true,
+        isActive: initialActive,
       },
       include: { client: true, templateInvoice: true },
     });
@@ -199,7 +215,7 @@ export class RecurringService {
 
     const finalStartAt = startAt ?? existing.startAt;
     const finalEndAt =
-      endAt === null ? existing.endAt : (endAt ?? existing.endAt);
+      body.endAt === undefined ? existing.endAt : (endAt ?? null);
     const finalNextRunAt = nextRunAt ?? existing.nextRunAt;
 
     if (finalEndAt && finalEndAt < finalStartAt)
@@ -207,7 +223,12 @@ export class RecurringService {
     if (finalNextRunAt < finalStartAt)
       throw new ApiError("nextRunAt must be >= startAt", 400);
 
-    return await this.prisma.recurringInvoice.update({
+    // ✅ Paper-ish: If endAt is set and already expired OR nextRunAt is beyond endAt, force inactive.
+    const now = new Date();
+    const mustBeInactive =
+      !!finalEndAt && (now > finalEndAt || finalNextRunAt > finalEndAt);
+
+    const updated = await this.prisma.recurringInvoice.update({
       where: { id },
       data: {
         ...(body.clientId !== undefined ? { clientId: body.clientId } : {}),
@@ -220,9 +241,12 @@ export class RecurringService {
         ...(body.templateInvoiceId !== undefined
           ? { templateInvoiceId: templateInvoiceId as any }
           : {}),
+        ...(mustBeInactive ? { isActive: false } : {}),
       },
       include: { client: true, templateInvoice: true },
     });
+
+    return updated;
   };
 
   private runOne = async (recurringId: string) => {
@@ -237,12 +261,22 @@ export class RecurringService {
       if (!rule) throw new ApiError("Recurring not found", 404);
       if (!rule.isActive) return { skipped: true, reason: "inactive" };
 
+      // ✅ expire if endAt passed
       if (rule.endAt && now > rule.endAt) {
         await tx.recurringInvoice.update({
           where: { id: rule.id },
           data: { isActive: false },
         });
         return { skipped: true, reason: "expired" };
+      }
+
+      // ✅ if nextRunAt is beyond endAt, no valid run -> deactivate
+      if (rule.endAt && rule.nextRunAt > rule.endAt) {
+        await tx.recurringInvoice.update({
+          where: { id: rule.id },
+          data: { isActive: false },
+        });
+        return { skipped: true, reason: "endAt_reached" };
       }
 
       if (!rule.templateInvoice) {
@@ -265,7 +299,6 @@ export class RecurringService {
       const discountAmount = new Prisma.Decimal(String(t.discountAmount ?? 0));
       const total = subtotal.add(taxAmount).sub(discountAmount);
 
-      // create new invoice
       const invoice = await tx.invoice.create({
         data: {
           userId: rule.userId,
@@ -301,6 +334,8 @@ export class RecurringService {
         rule.frequency,
         rule.interval,
       );
+
+      // ✅ if endAt exists and next schedule is beyond endAt, deactivate
       const willDeactivate = rule.endAt ? next > rule.endAt : false;
 
       await tx.recurringInvoice.update({
