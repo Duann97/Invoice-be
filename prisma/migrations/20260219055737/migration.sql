@@ -1,20 +1,11 @@
-/*
-  Warnings:
-
-  - You are about to drop the `samples` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
-CREATE TYPE "InvoiceStatus" AS ENUM ('DRAFT', 'SENT', 'PENDING', 'PAID', 'OVERDUE', 'CANCELLED');
+CREATE TYPE "InvoiceStatus" AS ENUM ('DRAFT', 'SENT', 'PAID', 'OVERDUE', 'CANCELLED');
 
 -- CreateEnum
 CREATE TYPE "RecurringFrequency" AS ENUM ('DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY');
 
 -- CreateEnum
 CREATE TYPE "EmailStatus" AS ENUM ('QUEUED', 'SENT', 'FAILED');
-
--- DropTable
-DROP TABLE "samples";
 
 -- CreateTable
 CREATE TABLE "User" (
@@ -129,10 +120,9 @@ CREATE TABLE "InvoiceItem" (
 CREATE TABLE "Payment" (
     "id" TEXT NOT NULL,
     "invoiceId" TEXT NOT NULL,
-    "amount" DECIMAL(18,2) NOT NULL,
-    "paidAt" TIMESTAMP(3) NOT NULL,
-    "method" TEXT,
-    "reference" TEXT,
+    "userId" TEXT NOT NULL,
+    "amount" DECIMAL(65,30) NOT NULL,
+    "paidAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "notes" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
@@ -152,6 +142,17 @@ CREATE TABLE "InvoiceEmail" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "InvoiceEmail_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "InvoiceCounter" (
+    "id" TEXT NOT NULL,
+    "userId" TEXT NOT NULL,
+    "period" TEXT NOT NULL,
+    "seq" INTEGER NOT NULL DEFAULT 0,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "InvoiceCounter_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -230,13 +231,22 @@ CREATE INDEX "InvoiceItem_productId_idx" ON "InvoiceItem"("productId");
 CREATE INDEX "Payment_invoiceId_idx" ON "Payment"("invoiceId");
 
 -- CreateIndex
-CREATE INDEX "Payment_paidAt_idx" ON "Payment"("paidAt");
+CREATE INDEX "Payment_userId_idx" ON "Payment"("userId");
+
+-- CreateIndex
+CREATE INDEX "Payment_userId_invoiceId_idx" ON "Payment"("userId", "invoiceId");
 
 -- CreateIndex
 CREATE INDEX "InvoiceEmail_invoiceId_idx" ON "InvoiceEmail"("invoiceId");
 
 -- CreateIndex
 CREATE INDEX "InvoiceEmail_status_idx" ON "InvoiceEmail"("status");
+
+-- CreateIndex
+CREATE INDEX "InvoiceCounter_userId_period_idx" ON "InvoiceCounter"("userId", "period");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "InvoiceCounter_userId_period_key" ON "InvoiceCounter"("userId", "period");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "RecurringInvoice_templateInvoiceId_key" ON "RecurringInvoice"("templateInvoiceId");
@@ -282,6 +292,9 @@ ALTER TABLE "InvoiceItem" ADD CONSTRAINT "InvoiceItem_productId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "Payment" ADD CONSTRAINT "Payment_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "Payment" ADD CONSTRAINT "Payment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "InvoiceEmail" ADD CONSTRAINT "InvoiceEmail_invoiceId_fkey" FOREIGN KEY ("invoiceId") REFERENCES "Invoice"("id") ON DELETE CASCADE ON UPDATE CASCADE;
