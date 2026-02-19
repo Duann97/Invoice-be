@@ -25,8 +25,28 @@ const genInvoiceNumber = () => {
 };
 
 const toDec = (v: any) => new Prisma.Decimal(String(v ?? 0));
+
+/**
+ * ✅ FIX: support Prisma.Decimal and any numeric-like object via toString()
+ */
 const toNum = (v: any) => {
-  const n = typeof v === "string" ? Number(v) : v;
+  if (v === null || v === undefined) return 0;
+
+  if (typeof v === "number") return Number.isFinite(v) ? v : 0;
+  if (typeof v === "string") {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  }
+
+  // Prisma.Decimal (or similar): has toString()
+  try {
+    if (typeof v?.toString === "function") {
+      const n = Number(v.toString());
+      return Number.isFinite(n) ? n : 0;
+    }
+  } catch {}
+
+  const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 };
 
@@ -46,15 +66,9 @@ export class InvoicesService {
     return x;
   };
 
-  /**
-   * ✅ Derived overdue rule (for response/UI/KPI):
-   * - PAID/CANCELLED never overdue
-   * - If dueDate exists and already past end-of-day => overdue
-   * - Applies even if status is DRAFT (so UI can show overdue if due date passed)
-   */
-  private isOverdueDerived = (status: any, dueDate: any) => {
+  private shouldBeOverdue = (status: any, dueDate: any) => {
     const s = String(status ?? "").toUpperCase();
-    if (s === "PAID" || s === "CANCELLED") return false;
+    if (s !== "SENT") return false;
     if (!dueDate) return false;
 
     const due = new Date(dueDate);
@@ -63,48 +77,28 @@ export class InvoicesService {
     return new Date().getTime() > this.endOfDay(due).getTime();
   };
 
-  /**
-   * ✅ Sync to DB ONLY for SENT -> OVERDUE (safe),
-   * but return overdueIds for BOTH SENT & DRAFT (derived), so response can be patched.
-   */
   private syncOverdueForInvoices = async (
     userId: string,
     invoices: Array<{ id: string; status?: any; dueDate?: any }>,
   ) => {
     const overdueIds = invoices
-      .filter((inv) => this.isOverdueDerived(inv.status, inv.dueDate))
+      .filter((inv) => this.shouldBeOverdue(inv.status, inv.dueDate))
       .map((inv) => inv.id);
 
     if (overdueIds.length === 0) return overdueIds;
 
-    // only persist DB change for SENT invoices
-    const sentOverdueIds = invoices
-      .filter(
-        (inv) =>
-          String(inv.status ?? "").toUpperCase() === "SENT" &&
-          this.isOverdueDerived(inv.status, inv.dueDate),
-      )
-      .map((inv) => inv.id);
-
-    if (sentOverdueIds.length > 0) {
-      await this.prisma.invoice.updateMany({
-        where: {
-          userId,
-          id: { in: sentOverdueIds },
-          status: "SENT",
-        },
-        data: { status: "OVERDUE" as any },
-      });
-    }
+    await this.prisma.invoice.updateMany({
+      where: {
+        userId,
+        id: { in: overdueIds },
+        status: "SENT",
+      },
+      data: { status: "OVERDUE" as any },
+    });
 
     return overdueIds;
   };
 
-  /**
-   * ✅ For detail endpoint:
-   * - if SENT already overdue => update DB to OVERDUE
-   * - return whether it is overdue derived (so we can patch response)
-   */
   private syncOverdueForSingle = async (userId: string, id: string) => {
     const inv = await this.prisma.invoice.findFirst({
       where: { id, userId },
@@ -112,18 +106,14 @@ export class InvoicesService {
     });
     if (!inv) throw new ApiError("Invoice not found", 404);
 
-    const overdue = this.isOverdueDerived(inv.status, inv.dueDate);
-    if (!overdue) return { overdue: false };
+    if (!this.shouldBeOverdue(inv.status, inv.dueDate)) return false;
 
-    const s = String(inv.status ?? "").toUpperCase();
-    if (s === "SENT") {
-      await this.prisma.invoice.update({
-        where: { id },
-        data: { status: "OVERDUE" as any },
-      });
-    }
+    await this.prisma.invoice.update({
+      where: { id },
+      data: { status: "OVERDUE" as any },
+    });
 
-    return { overdue: true };
+    return true;
   };
 
   create = async (userId: string, body: CreateInvoiceDTO) => {
@@ -251,7 +241,6 @@ export class InvoicesService {
       this.prisma.invoice.count({ where }),
     ]);
 
-    // ✅ patch overdue (DB sync for SENT only; response patch for SENT & DRAFT)
     const overdueIds = await this.syncOverdueForInvoices(
       userId,
       data.map((x: any) => ({
@@ -280,7 +269,7 @@ export class InvoicesService {
   };
 
   detail = async (userId: string, id: string) => {
-    const { overdue } = await this.syncOverdueForSingle(userId, id);
+    await this.syncOverdueForSingle(userId, id);
 
     const inv = await this.prisma.invoice.findFirst({
       where: { id, userId },
@@ -293,12 +282,6 @@ export class InvoicesService {
     });
 
     if (!inv) throw new ApiError("Invoice not found", 404);
-
-    // ✅ patch response for DRAFT overdue too
-    if (overdue) {
-      return { ...inv, status: "OVERDUE" as any };
-    }
-
     return inv;
   };
 
@@ -452,28 +435,53 @@ export class InvoicesService {
       const companyName =
         safeTrim(inv.user?.profile?.companyName) || "Invoice App";
 
-      const items = (inv.items ?? []).map((it: any) => ({
-        name: it.itemName || it.product?.name || "Item",
-        description: it.description ?? "",
-        qty: String(it.quantity),
-        price: this.formatIDR(it.unitPrice),
-        lineTotal: this.formatIDR(it.lineTotal),
-      }));
+      // ✅ FIX: provide both key styles so invoice-email.hbs & invoice.hbs work
+      const items = (inv.items ?? []).map((it: any) => {
+        const qtyNum = toNum(it.quantity);
+        const unitPriceNum = toNum(it.unitPrice);
+        const lineTotalNum = toNum(it.lineTotal);
+
+        return {
+          // label
+          name: it.itemName || it.product?.name || "Item",
+          description: it.description ?? "",
+
+          // invoice-email.hbs keys
+          qty: String(qtyNum),
+          price: this.formatIDR(unitPriceNum),
+          lineTotal: this.formatIDR(lineTotalNum),
+
+          // invoice.hbs keys
+          quantity: String(qtyNum),
+          unitPrice: this.formatIDR(unitPriceNum),
+        };
+      });
 
       const context = {
         companyName,
         clientName: inv.client?.name ?? "Client",
         clientEmail: toEmail,
         clientAddress: (inv.client as any)?.address ?? "",
+
+        // optional fields for other template
+        clientPhone: (inv.client as any)?.phone ?? "",
+        status: String(inv.status ?? "DRAFT").toUpperCase(),
+        senderName: safeTrim((inv.user as any)?.name ?? "") || "Invoice App",
+        companyAddress: safeTrim(inv.user?.profile?.companyAddress ?? ""),
+        senderPhone: safeTrim(inv.user?.profile?.phone ?? ""),
+
         invoiceNumber: inv.invoiceNumber,
         issueDate: String(inv.issueDate).slice(0, 10),
         dueDate: String(inv.dueDate).slice(0, 10),
         currency: inv.currency ?? "IDR",
         items,
+
+        // ✅ FIX: now Decimal -> number works
         subtotal: this.formatIDR(inv.subtotal),
         taxAmount: this.formatIDR(inv.taxAmount),
         discountAmount: this.formatIDR(inv.discountAmount),
         total: this.formatIDR(inv.total),
+
         notes: inv.notes ?? "",
       };
 
