@@ -11,7 +11,6 @@ export class ListRecurringDTO {
   @Min(1)
   limit?: number;
 
-  // "all" | "active" | "inactive"
   @IsOptional()
   @IsIn(["all", "active", "inactive"])
   active?: "all" | "active" | "inactive";

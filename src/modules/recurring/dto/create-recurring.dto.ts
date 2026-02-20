@@ -37,11 +37,6 @@ export class CreateRecurringDTO {
   endAt?: string;
 
   @IsOptional()
-  @IsInt()
-  @Min(1)
-  maxOccurrences?: number;
-
-  @IsOptional()
   @IsBoolean()
   isActive?: boolean;
 }

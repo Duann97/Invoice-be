@@ -17,6 +17,7 @@ function addInterval(base: Date, freq: RecurringFrequency, interval: number) {
   else if (freq === "WEEKLY") d.setDate(d.getDate() + n * 7);
   else if (freq === "MONTHLY") d.setMonth(d.getMonth() + n);
   else if (freq === "YEARLY") d.setFullYear(d.getFullYear() + n);
+
   return d;
 }
 
@@ -24,38 +25,34 @@ export class RecurringService {
   constructor(private prisma: PrismaClient) {}
 
   private computeInitialNextRunAt(startAt: Date) {
-    // paper.id-ish: first run biasanya di startAt
+    // Simple & predictable: first run = startAt
     return startAt;
   }
 
-  private shouldDeactivate(rule: any, now = new Date()) {
-    if (!rule.isActive) return true;
-
-    if (rule.endAt && now.getTime() > new Date(rule.endAt).getTime()) {
-      return true;
-    }
-    if (rule.maxOccurrences && rule.occurrenceCount >= rule.maxOccurrences) {
-      return true;
-    }
-    return false;
+  private shouldDeactivate(endAt: Date | null, nextRunAt: Date) {
+    if (!endAt) return false;
+    return nextRunAt.getTime() > endAt.getTime();
   }
 
   create = async (userId: string, body: CreateRecurringDTO) => {
+    // validate client
     const client = await this.prisma.client.findFirst({
       where: { id: body.clientId, userId },
       select: { id: true },
     });
     if (!client) throw new ApiError("Client not found", 404);
 
+    // validate template invoice must belong to user+client
     const template = await this.prisma.invoice.findFirst({
       where: { id: body.templateInvoiceId, userId, clientId: body.clientId },
       select: { id: true },
     });
-    if (!template)
+    if (!template) {
       throw new ApiError(
         "Template invoice not found (must belong to selected client)",
         404,
       );
+    }
 
     const startAt = toDate(body.startAt);
     if (Number.isNaN(startAt.getTime()))
@@ -65,39 +62,55 @@ export class RecurringService {
     if (endAt && Number.isNaN(endAt.getTime()))
       throw new ApiError("Invalid endAt", 400);
 
+    if (endAt && endAt.getTime() < startAt.getTime()) {
+      throw new ApiError("endAt must be after startAt", 400);
+    }
+
     const interval = Math.max(Number(body.interval || 1), 1);
     const frequency = body.frequency as any as RecurringFrequency;
 
     const nextRunAt = this.computeInitialNextRunAt(startAt);
 
-    // validasi paper.id-ish:
-    // endAt harus >= startAt
-    if (endAt && endAt.getTime() < startAt.getTime()) {
-      throw new ApiError("endAt must be after startAt", 400);
-    }
-
-    const created = await this.prisma.recurringInvoice.create({
-      data: {
-        userId,
-        clientId: body.clientId,
-        templateInvoiceId: body.templateInvoiceId,
-        frequency,
-        interval,
-        startAt,
-        nextRunAt,
-        endAt: endAt ?? undefined,
-        maxOccurrences: body.maxOccurrences ?? undefined,
-        isActive: body.isActive ?? true,
-      },
-      include: {
-        client: { select: { id: true, name: true } },
-        templateInvoice: {
-          select: { id: true, invoiceNumber: true, total: true, status: true },
+    // IMPORTANT: schema kamu punya templateInvoiceId @unique
+    // Jadi kalau template invoice sudah pernah dipakai recurring, create akan error P2002.
+    // Kita kasih message yang jelas.
+    try {
+      const created = await this.prisma.recurringInvoice.create({
+        data: {
+          userId,
+          clientId: body.clientId,
+          templateInvoiceId: body.templateInvoiceId, // schema: String? tapi kita wajibkan dari DTO
+          frequency,
+          interval,
+          startAt,
+          endAt: endAt ?? undefined,
+          nextRunAt,
+          isActive: body.isActive ?? true,
         },
-      },
-    });
+        include: {
+          client: { select: { id: true, name: true } },
+          templateInvoice: {
+            select: {
+              id: true,
+              invoiceNumber: true,
+              total: true,
+              status: true,
+            },
+          },
+        },
+      });
 
-    return created;
+      return created;
+    } catch (e: any) {
+      // Prisma unique constraint
+      if (e?.code === "P2002") {
+        throw new ApiError(
+          "Template invoice sudah dipakai di recurring lain. Buat invoice template baru atau hapus @unique di schema.",
+          400,
+        );
+      }
+      throw e;
+    }
   };
 
   list = async (userId: string, query: ListRecurringDTO) => {
@@ -151,11 +164,8 @@ export class RecurringService {
   };
 
   /**
-   * Dipanggil Cron:
-   * - generate invoice untuk rule yang due
-   * - update nextRunAt
-   * - increment occurrenceCount
-   * - auto set isActive=false kalau endAt/maxOccurrences tercapai
+   * Cron runner: generate invoice untuk rules yang due.
+   * Sesuai schema lama: stop hanya pakai endAt.
    */
   runDueRules = async () => {
     const now = new Date();
@@ -174,18 +184,10 @@ export class RecurringService {
     });
 
     for (const rule of dueRules) {
-      // double guard auto inactive
-      if (this.shouldDeactivate(rule, now)) {
-        await this.prisma.recurringInvoice.update({
-          where: { id: rule.id },
-          data: { isActive: false },
-        });
-        continue;
-      }
-
-      // generate invoice from template
       const tpl: any = rule.templateInvoice;
-      if (!tpl) {
+
+      // kalau template invoice hilang/null (karena onDelete SetNull), matikan rule biar gak error terus
+      if (!tpl || !rule.templateInvoiceId) {
         await this.prisma.recurringInvoice.update({
           where: { id: rule.id },
           data: { isActive: false },
@@ -193,9 +195,7 @@ export class RecurringService {
         continue;
       }
 
-      // Issue date = now (atau rule.nextRunAt)
       const issueDate = now;
-      // Due date: ikut template paymentTerms kalau ada, fallback +7 hari
       const dueDate = new Date(issueDate);
       dueDate.setDate(dueDate.getDate() + 7);
 
@@ -229,24 +229,18 @@ export class RecurringService {
         },
       });
 
-      // update schedule
       const next = addInterval(
         new Date(rule.nextRunAt),
         rule.frequency,
         rule.interval,
       );
-      const newOccurrence = (rule.occurrenceCount ?? 0) + 1;
+      const endAt = rule.endAt ? new Date(rule.endAt) : null;
 
-      // decide deactivate after increment
-      const willDeactivate =
-        (rule.endAt && next.getTime() > new Date(rule.endAt).getTime()) ||
-        (rule.maxOccurrences && newOccurrence >= rule.maxOccurrences);
+      const willDeactivate = this.shouldDeactivate(endAt, next);
 
       await this.prisma.recurringInvoice.update({
         where: { id: rule.id },
         data: {
-          occurrenceCount: newOccurrence,
-          lastRunAt: now,
           nextRunAt: next,
           isActive: willDeactivate ? false : true,
         },

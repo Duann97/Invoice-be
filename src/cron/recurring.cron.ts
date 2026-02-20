@@ -10,7 +10,7 @@ export class RecurringCron {
   }
 
   start() {
-    // tiap menit (buat test). Nanti production bisa tiap 5 menit
+    // setiap menit untuk testing
     cron.schedule("* * * * *", async () => {
       try {
         const r = await this.service.runDueRules();
