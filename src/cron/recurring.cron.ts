@@ -3,21 +3,26 @@ import { PrismaClient } from "../generated/prisma/client.js";
 import { RecurringService } from "../modules/recurring/recurring.service.js";
 
 export class RecurringCron {
-  private service: RecurringService;
+  private task: any;
 
-  constructor(private prisma: PrismaClient) {
-    this.service = new RecurringService(prisma);
-  }
+  constructor(private prisma: PrismaClient) {}
 
   start() {
-    // setiap menit untuk testing
-    cron.schedule("* * * * *", async () => {
+    const service = new RecurringService(this.prisma);
+
+    this.task = cron.schedule("* * * * *", async () => {
       try {
-        const r = await this.service.runDueRules();
-        console.log("[recurring-cron] processed:", r.processed);
+        await service.runDue();
       } catch (e) {
-        console.error("[recurring-cron] error:", e);
+        console.error("[recurring-cron] runDue error:", e);
       }
     });
+
+    this.task.start();
+    console.log("[recurring-cron] started: every minute");
+  }
+
+  stop() {
+    if (this.task) this.task.stop();
   }
 }
