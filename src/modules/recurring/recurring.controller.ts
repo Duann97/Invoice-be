@@ -1,25 +1,47 @@
 import { Request, Response } from "express";
 import { RecurringService } from "./recurring.service.js";
+import { CreateRecurringDTO } from "./dto/create-recurring.dto.js";
+import { GetRecurringDTO } from "./dto/get-recurring.dto.js";
+import { UpdateRecurringDTO } from "./dto/update-recurring.dto.js";
+import { RunRecurringDTO } from "./dto/run-recurring.dto.js";
 
 export class RecurringController {
-  constructor(private service: RecurringService) {}
+  constructor(private recurringService: RecurringService) {}
 
   list = async (req: Request, res: Response) => {
-    const userId = (req as any).user?.id;
-    const data = await this.service.list(userId, req.query as any);
-    return res.json({ message: "OK", data });
+    const userId = res.locals.user?.id as string;
+    const query = (res.locals.query ?? req.query) as any as GetRecurringDTO;
+
+    const result = await this.recurringService.list(userId, query);
+    return res.status(200).json({ message: "OK", ...result });
   };
 
   create = async (req: Request, res: Response) => {
-    const userId = (req as any).user?.id;
-    const created = await this.service.create(userId, req.body);
-    return res.status(201).json({ message: "Created", data: created });
+    const userId = res.locals.user?.id as string;
+    const body = req.body as CreateRecurringDTO;
+
+    const created = await this.recurringService.create(userId, body);
+    return res
+      .status(201)
+      .json({ message: "Recurring created", data: created });
   };
 
-  toggle = async (req: Request, res: Response) => {
-    const userId = (req as any).user?.id;
-    const id = req.params.id;
-    const updated = await this.service.toggle(userId, id, req.body.isActive);
-    return res.json({ message: "OK", data: updated });
+  update = async (req: Request, res: Response) => {
+    const userId = res.locals.user?.id as string;
+    const { id } = req.params;
+    const body = req.body as UpdateRecurringDTO;
+
+    const updated = await this.recurringService.update(userId, id, body);
+    return res
+      .status(200)
+      .json({ message: "Recurring updated", data: updated });
+  };
+
+  run = async (req: Request, res: Response) => {
+    const userId = res.locals.user?.id as string;
+    const body = (req.body ?? {}) as RunRecurringDTO;
+
+    const result = await this.recurringService.runManual(userId, body.id);
+    return res.status(200).json({ message: "OK", data: result });
   };
 }

@@ -2,15 +2,19 @@ import {
   IsBoolean,
   IsIn,
   IsInt,
-  IsISO8601,
   IsOptional,
+  IsString,
   Min,
 } from "class-validator";
 
 export class UpdateRecurringDTO {
   @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
+  @IsString()
+  clientId?: string;
+
+  @IsOptional()
+  @IsString()
+  templateInvoiceId?: string;
 
   @IsOptional()
   @IsIn(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"])
@@ -22,6 +26,18 @@ export class UpdateRecurringDTO {
   interval?: number;
 
   @IsOptional()
-  @IsISO8601()
-  endAt?: string; // null handling kita urus di service (kalau butuh)
+  @IsString()
+  startAt?: string;
+
+  @IsOptional()
+  @IsString()
+  endAt?: string;
+
+  @IsOptional()
+  @IsString()
+  nextRunAt?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  isActive?: boolean;
 }
