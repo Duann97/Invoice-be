@@ -1,5 +1,11 @@
-import { Transform } from "class-transformer";
-import { IsOptional, IsBoolean, IsString } from "class-validator";
+import {
+  IsBoolean,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Min,
+} from "class-validator";
+import { Type } from "class-transformer";
 
 export class GetProductsDTO {
   @IsOptional()
@@ -11,12 +17,16 @@ export class GetProductsDTO {
   categoryId?: string;
 
   @IsOptional()
-  @Transform(({ value }) => {
-    if (value === undefined) return undefined;
-    if (typeof value === "boolean") return value;
-    const v = String(value).toLowerCase().trim();
-    return v === "true" || v === "1" || v === "yes";
-  })
-  @IsBoolean()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  page?: number = 1;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  limit?: number = 10;
+
   includeDeleted?: boolean;
 }

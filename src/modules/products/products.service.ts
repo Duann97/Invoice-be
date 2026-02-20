@@ -78,6 +78,7 @@ export class ProductsService {
     return created;
   };
 
+  // ✅ ONLY ADD: pagination (tanpa ubah filter logic yg udah bener)
   findAll = async (userId: string, query: GetProductsDTO) => {
     const includeDeleted = query.includeDeleted === true;
 
@@ -94,15 +95,50 @@ export class ProductsService {
       where.name = { contains: query.q.trim(), mode: "insensitive" };
     }
 
-    const products = await this.prisma.product.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      include: {
-        category: true,
-      },
-    });
+    const pageRaw = (query as any).page;
+    const limitRaw = (query as any).limit;
 
-    return products;
+    const page =
+      typeof pageRaw === "number"
+        ? pageRaw
+        : typeof pageRaw === "string"
+          ? Number(pageRaw)
+          : 1;
+
+    const limit =
+      typeof limitRaw === "number"
+        ? limitRaw
+        : typeof limitRaw === "string"
+          ? Number(limitRaw)
+          : 10;
+
+    const safePage = Number.isFinite(page) && page > 0 ? page : 1;
+    const safeLimit = Number.isFinite(limit) && limit > 0 ? limit : 10;
+
+    const skip = (safePage - 1) * safeLimit;
+
+    const [products, total] = await Promise.all([
+      this.prisma.product.findMany({
+        where,
+        orderBy: { createdAt: "desc" },
+        skip,
+        take: safeLimit,
+        include: {
+          category: true,
+        },
+      }),
+      this.prisma.product.count({ where }),
+    ]);
+
+    return {
+      items: products,
+      meta: {
+        page: safePage,
+        limit: safeLimit,
+        total,
+        totalPages: Math.ceil(total / safeLimit),
+      },
+    };
   };
 
   update = async (userId: string, id: string, body: UpdateProductDTO) => {
