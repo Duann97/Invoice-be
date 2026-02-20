@@ -2000,12 +2000,14 @@ export namespace Prisma {
     items: number
     payments: number
     emails: number
+    recurringTemplate: number
   }
 
   export type InvoiceCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     items?: boolean | InvoiceCountOutputTypeCountItemsArgs
     payments?: boolean | InvoiceCountOutputTypeCountPaymentsArgs
     emails?: boolean | InvoiceCountOutputTypeCountEmailsArgs
+    recurringTemplate?: boolean | InvoiceCountOutputTypeCountRecurringTemplateArgs
   }
 
   // Custom InputTypes
@@ -2038,6 +2040,13 @@ export namespace Prisma {
    */
   export type InvoiceCountOutputTypeCountEmailsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: InvoiceEmailWhereInput
+  }
+
+  /**
+   * InvoiceCountOutputType without action
+   */
+  export type InvoiceCountOutputTypeCountRecurringTemplateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: RecurringInvoiceWhereInput
   }
 
 
@@ -8213,7 +8222,7 @@ export namespace Prisma {
     items?: boolean | Invoice$itemsArgs<ExtArgs>
     payments?: boolean | Invoice$paymentsArgs<ExtArgs>
     emails?: boolean | Invoice$emailsArgs<ExtArgs>
-    recurringAsTemplate?: boolean | Invoice$recurringAsTemplateArgs<ExtArgs>
+    recurringTemplate?: boolean | Invoice$recurringTemplateArgs<ExtArgs>
     _count?: boolean | InvoiceCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["invoice"]>
 
@@ -8285,7 +8294,7 @@ export namespace Prisma {
     items?: boolean | Invoice$itemsArgs<ExtArgs>
     payments?: boolean | Invoice$paymentsArgs<ExtArgs>
     emails?: boolean | Invoice$emailsArgs<ExtArgs>
-    recurringAsTemplate?: boolean | Invoice$recurringAsTemplateArgs<ExtArgs>
+    recurringTemplate?: boolean | Invoice$recurringTemplateArgs<ExtArgs>
     _count?: boolean | InvoiceCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type InvoiceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8305,7 +8314,7 @@ export namespace Prisma {
       items: Prisma.$InvoiceItemPayload<ExtArgs>[]
       payments: Prisma.$PaymentPayload<ExtArgs>[]
       emails: Prisma.$InvoiceEmailPayload<ExtArgs>[]
-      recurringAsTemplate: Prisma.$RecurringInvoicePayload<ExtArgs> | null
+      recurringTemplate: Prisma.$RecurringInvoicePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -8723,7 +8732,7 @@ export namespace Prisma {
     items<T extends Invoice$itemsArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$itemsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceItemPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     payments<T extends Invoice$paymentsArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     emails<T extends Invoice$emailsArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$emailsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$InvoiceEmailPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
-    recurringAsTemplate<T extends Invoice$recurringAsTemplateArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$recurringAsTemplateArgs<ExtArgs>>): Prisma__RecurringInvoiceClient<$Result.GetResult<Prisma.$RecurringInvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    recurringTemplate<T extends Invoice$recurringTemplateArgs<ExtArgs> = {}>(args?: Subset<T, Invoice$recurringTemplateArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$RecurringInvoicePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -9237,9 +9246,9 @@ export namespace Prisma {
   }
 
   /**
-   * Invoice.recurringAsTemplate
+   * Invoice.recurringTemplate
    */
-  export type Invoice$recurringAsTemplateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+  export type Invoice$recurringTemplateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     /**
      * Select specific fields to fetch from the RecurringInvoice
      */
@@ -9253,6 +9262,11 @@ export namespace Prisma {
      */
     include?: RecurringInvoiceInclude<ExtArgs> | null
     where?: RecurringInvoiceWhereInput
+    orderBy?: RecurringInvoiceOrderByWithRelationInput | RecurringInvoiceOrderByWithRelationInput[]
+    cursor?: RecurringInvoiceWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: RecurringInvoiceScalarFieldEnum | RecurringInvoiceScalarFieldEnum[]
   }
 
   /**
@@ -13745,10 +13759,12 @@ export namespace Prisma {
 
   export type RecurringInvoiceAvgAggregateOutputType = {
     interval: number | null
+    occurrenceCount: number | null
   }
 
   export type RecurringInvoiceSumAggregateOutputType = {
     interval: number | null
+    occurrenceCount: number | null
   }
 
   export type RecurringInvoiceMinAggregateOutputType = {
@@ -13759,9 +13775,11 @@ export namespace Prisma {
     frequency: $Enums.RecurringFrequency | null
     interval: number | null
     startAt: Date | null
-    endAt: Date | null
     nextRunAt: Date | null
+    endAt: Date | null
     isActive: boolean | null
+    lastRunAt: Date | null
+    occurrenceCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13774,9 +13792,11 @@ export namespace Prisma {
     frequency: $Enums.RecurringFrequency | null
     interval: number | null
     startAt: Date | null
-    endAt: Date | null
     nextRunAt: Date | null
+    endAt: Date | null
     isActive: boolean | null
+    lastRunAt: Date | null
+    occurrenceCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13789,9 +13809,11 @@ export namespace Prisma {
     frequency: number
     interval: number
     startAt: number
-    endAt: number
     nextRunAt: number
+    endAt: number
     isActive: number
+    lastRunAt: number
+    occurrenceCount: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -13800,10 +13822,12 @@ export namespace Prisma {
 
   export type RecurringInvoiceAvgAggregateInputType = {
     interval?: true
+    occurrenceCount?: true
   }
 
   export type RecurringInvoiceSumAggregateInputType = {
     interval?: true
+    occurrenceCount?: true
   }
 
   export type RecurringInvoiceMinAggregateInputType = {
@@ -13814,9 +13838,11 @@ export namespace Prisma {
     frequency?: true
     interval?: true
     startAt?: true
-    endAt?: true
     nextRunAt?: true
+    endAt?: true
     isActive?: true
+    lastRunAt?: true
+    occurrenceCount?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13829,9 +13855,11 @@ export namespace Prisma {
     frequency?: true
     interval?: true
     startAt?: true
-    endAt?: true
     nextRunAt?: true
+    endAt?: true
     isActive?: true
+    lastRunAt?: true
+    occurrenceCount?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13844,9 +13872,11 @@ export namespace Prisma {
     frequency?: true
     interval?: true
     startAt?: true
-    endAt?: true
     nextRunAt?: true
+    endAt?: true
     isActive?: true
+    lastRunAt?: true
+    occurrenceCount?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -13942,13 +13972,15 @@ export namespace Prisma {
     id: string
     userId: string
     clientId: string
-    templateInvoiceId: string | null
+    templateInvoiceId: string
     frequency: $Enums.RecurringFrequency
     interval: number
     startAt: Date
-    endAt: Date | null
     nextRunAt: Date
+    endAt: Date | null
     isActive: boolean
+    lastRunAt: Date | null
+    occurrenceCount: number
     createdAt: Date
     updatedAt: Date
     _count: RecurringInvoiceCountAggregateOutputType | null
@@ -13980,14 +14012,16 @@ export namespace Prisma {
     frequency?: boolean
     interval?: boolean
     startAt?: boolean
-    endAt?: boolean
     nextRunAt?: boolean
+    endAt?: boolean
     isActive?: boolean
+    lastRunAt?: boolean
+    occurrenceCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    templateInvoice?: boolean | RecurringInvoice$templateInvoiceArgs<ExtArgs>
+    templateInvoice?: boolean | InvoiceDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["recurringInvoice"]>
 
   export type RecurringInvoiceSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -13998,14 +14032,16 @@ export namespace Prisma {
     frequency?: boolean
     interval?: boolean
     startAt?: boolean
-    endAt?: boolean
     nextRunAt?: boolean
+    endAt?: boolean
     isActive?: boolean
+    lastRunAt?: boolean
+    occurrenceCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    templateInvoice?: boolean | RecurringInvoice$templateInvoiceArgs<ExtArgs>
+    templateInvoice?: boolean | InvoiceDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["recurringInvoice"]>
 
   export type RecurringInvoiceSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -14016,14 +14052,16 @@ export namespace Prisma {
     frequency?: boolean
     interval?: boolean
     startAt?: boolean
-    endAt?: boolean
     nextRunAt?: boolean
+    endAt?: boolean
     isActive?: boolean
+    lastRunAt?: boolean
+    occurrenceCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    templateInvoice?: boolean | RecurringInvoice$templateInvoiceArgs<ExtArgs>
+    templateInvoice?: boolean | InvoiceDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["recurringInvoice"]>
 
   export type RecurringInvoiceSelectScalar = {
@@ -14034,28 +14072,30 @@ export namespace Prisma {
     frequency?: boolean
     interval?: boolean
     startAt?: boolean
-    endAt?: boolean
     nextRunAt?: boolean
+    endAt?: boolean
     isActive?: boolean
+    lastRunAt?: boolean
+    occurrenceCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RecurringInvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "clientId" | "templateInvoiceId" | "frequency" | "interval" | "startAt" | "endAt" | "nextRunAt" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["recurringInvoice"]>
+  export type RecurringInvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "clientId" | "templateInvoiceId" | "frequency" | "interval" | "startAt" | "nextRunAt" | "endAt" | "isActive" | "lastRunAt" | "occurrenceCount" | "createdAt" | "updatedAt", ExtArgs["result"]["recurringInvoice"]>
   export type RecurringInvoiceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    templateInvoice?: boolean | RecurringInvoice$templateInvoiceArgs<ExtArgs>
+    templateInvoice?: boolean | InvoiceDefaultArgs<ExtArgs>
   }
   export type RecurringInvoiceIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    templateInvoice?: boolean | RecurringInvoice$templateInvoiceArgs<ExtArgs>
+    templateInvoice?: boolean | InvoiceDefaultArgs<ExtArgs>
   }
   export type RecurringInvoiceIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
-    templateInvoice?: boolean | RecurringInvoice$templateInvoiceArgs<ExtArgs>
+    templateInvoice?: boolean | InvoiceDefaultArgs<ExtArgs>
   }
 
   export type $RecurringInvoicePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -14063,19 +14103,21 @@ export namespace Prisma {
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
       client: Prisma.$ClientPayload<ExtArgs>
-      templateInvoice: Prisma.$InvoicePayload<ExtArgs> | null
+      templateInvoice: Prisma.$InvoicePayload<ExtArgs>
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
       clientId: string
-      templateInvoiceId: string | null
+      templateInvoiceId: string
       frequency: $Enums.RecurringFrequency
       interval: number
       startAt: Date
-      endAt: Date | null
       nextRunAt: Date
+      endAt: Date | null
       isActive: boolean
+      lastRunAt: Date | null
+      occurrenceCount: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["recurringInvoice"]>
@@ -14474,7 +14516,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     client<T extends ClientDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ClientDefaultArgs<ExtArgs>>): Prisma__ClientClient<$Result.GetResult<Prisma.$ClientPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    templateInvoice<T extends RecurringInvoice$templateInvoiceArgs<ExtArgs> = {}>(args?: Subset<T, RecurringInvoice$templateInvoiceArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    templateInvoice<T extends InvoiceDefaultArgs<ExtArgs> = {}>(args?: Subset<T, InvoiceDefaultArgs<ExtArgs>>): Prisma__InvoiceClient<$Result.GetResult<Prisma.$InvoicePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -14511,9 +14553,11 @@ export namespace Prisma {
     readonly frequency: FieldRef<"RecurringInvoice", 'RecurringFrequency'>
     readonly interval: FieldRef<"RecurringInvoice", 'Int'>
     readonly startAt: FieldRef<"RecurringInvoice", 'DateTime'>
-    readonly endAt: FieldRef<"RecurringInvoice", 'DateTime'>
     readonly nextRunAt: FieldRef<"RecurringInvoice", 'DateTime'>
+    readonly endAt: FieldRef<"RecurringInvoice", 'DateTime'>
     readonly isActive: FieldRef<"RecurringInvoice", 'Boolean'>
+    readonly lastRunAt: FieldRef<"RecurringInvoice", 'DateTime'>
+    readonly occurrenceCount: FieldRef<"RecurringInvoice", 'Int'>
     readonly createdAt: FieldRef<"RecurringInvoice", 'DateTime'>
     readonly updatedAt: FieldRef<"RecurringInvoice", 'DateTime'>
   }
@@ -14912,25 +14956,6 @@ export namespace Prisma {
   }
 
   /**
-   * RecurringInvoice.templateInvoice
-   */
-  export type RecurringInvoice$templateInvoiceArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Invoice
-     */
-    select?: InvoiceSelect<ExtArgs> | null
-    /**
-     * Omit specific fields from the Invoice
-     */
-    omit?: InvoiceOmit<ExtArgs> | null
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: InvoiceInclude<ExtArgs> | null
-    where?: InvoiceWhereInput
-  }
-
-  /**
    * RecurringInvoice without action
    */
   export type RecurringInvoiceDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15120,9 +15145,11 @@ export namespace Prisma {
     frequency: 'frequency',
     interval: 'interval',
     startAt: 'startAt',
-    endAt: 'endAt',
     nextRunAt: 'nextRunAt',
+    endAt: 'endAt',
     isActive: 'isActive',
+    lastRunAt: 'lastRunAt',
+    occurrenceCount: 'occurrenceCount',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -15703,7 +15730,7 @@ export namespace Prisma {
     items?: InvoiceItemListRelationFilter
     payments?: PaymentListRelationFilter
     emails?: InvoiceEmailListRelationFilter
-    recurringAsTemplate?: XOR<RecurringInvoiceNullableScalarRelationFilter, RecurringInvoiceWhereInput> | null
+    recurringTemplate?: RecurringInvoiceListRelationFilter
   }
 
   export type InvoiceOrderByWithRelationInput = {
@@ -15728,7 +15755,7 @@ export namespace Prisma {
     items?: InvoiceItemOrderByRelationAggregateInput
     payments?: PaymentOrderByRelationAggregateInput
     emails?: InvoiceEmailOrderByRelationAggregateInput
-    recurringAsTemplate?: RecurringInvoiceOrderByWithRelationInput
+    recurringTemplate?: RecurringInvoiceOrderByRelationAggregateInput
   }
 
   export type InvoiceWhereUniqueInput = Prisma.AtLeast<{
@@ -15757,7 +15784,7 @@ export namespace Prisma {
     items?: InvoiceItemListRelationFilter
     payments?: PaymentListRelationFilter
     emails?: InvoiceEmailListRelationFilter
-    recurringAsTemplate?: XOR<RecurringInvoiceNullableScalarRelationFilter, RecurringInvoiceWhereInput> | null
+    recurringTemplate?: RecurringInvoiceListRelationFilter
   }, "id" | "userId_invoiceNumber">
 
   export type InvoiceOrderByWithAggregationInput = {
@@ -16098,31 +16125,35 @@ export namespace Prisma {
     id?: StringFilter<"RecurringInvoice"> | string
     userId?: StringFilter<"RecurringInvoice"> | string
     clientId?: StringFilter<"RecurringInvoice"> | string
-    templateInvoiceId?: StringNullableFilter<"RecurringInvoice"> | string | null
+    templateInvoiceId?: StringFilter<"RecurringInvoice"> | string
     frequency?: EnumRecurringFrequencyFilter<"RecurringInvoice"> | $Enums.RecurringFrequency
     interval?: IntFilter<"RecurringInvoice"> | number
     startAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
-    endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
     nextRunAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
+    endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
     isActive?: BoolFilter<"RecurringInvoice"> | boolean
+    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    occurrenceCount?: IntFilter<"RecurringInvoice"> | number
     createdAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
-    templateInvoice?: XOR<InvoiceNullableScalarRelationFilter, InvoiceWhereInput> | null
+    templateInvoice?: XOR<InvoiceScalarRelationFilter, InvoiceWhereInput>
   }
 
   export type RecurringInvoiceOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
     clientId?: SortOrder
-    templateInvoiceId?: SortOrderInput | SortOrder
+    templateInvoiceId?: SortOrder
     frequency?: SortOrder
     interval?: SortOrder
     startAt?: SortOrder
-    endAt?: SortOrderInput | SortOrder
     nextRunAt?: SortOrder
+    endAt?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    lastRunAt?: SortOrderInput | SortOrder
+    occurrenceCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -16132,36 +16163,40 @@ export namespace Prisma {
 
   export type RecurringInvoiceWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    templateInvoiceId?: string
     AND?: RecurringInvoiceWhereInput | RecurringInvoiceWhereInput[]
     OR?: RecurringInvoiceWhereInput[]
     NOT?: RecurringInvoiceWhereInput | RecurringInvoiceWhereInput[]
     userId?: StringFilter<"RecurringInvoice"> | string
     clientId?: StringFilter<"RecurringInvoice"> | string
+    templateInvoiceId?: StringFilter<"RecurringInvoice"> | string
     frequency?: EnumRecurringFrequencyFilter<"RecurringInvoice"> | $Enums.RecurringFrequency
     interval?: IntFilter<"RecurringInvoice"> | number
     startAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
-    endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
     nextRunAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
+    endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
     isActive?: BoolFilter<"RecurringInvoice"> | boolean
+    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    occurrenceCount?: IntFilter<"RecurringInvoice"> | number
     createdAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
     client?: XOR<ClientScalarRelationFilter, ClientWhereInput>
-    templateInvoice?: XOR<InvoiceNullableScalarRelationFilter, InvoiceWhereInput> | null
-  }, "id" | "templateInvoiceId">
+    templateInvoice?: XOR<InvoiceScalarRelationFilter, InvoiceWhereInput>
+  }, "id">
 
   export type RecurringInvoiceOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
     clientId?: SortOrder
-    templateInvoiceId?: SortOrderInput | SortOrder
+    templateInvoiceId?: SortOrder
     frequency?: SortOrder
     interval?: SortOrder
     startAt?: SortOrder
-    endAt?: SortOrderInput | SortOrder
     nextRunAt?: SortOrder
+    endAt?: SortOrderInput | SortOrder
     isActive?: SortOrder
+    lastRunAt?: SortOrderInput | SortOrder
+    occurrenceCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: RecurringInvoiceCountOrderByAggregateInput
@@ -16178,13 +16213,15 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"RecurringInvoice"> | string
     userId?: StringWithAggregatesFilter<"RecurringInvoice"> | string
     clientId?: StringWithAggregatesFilter<"RecurringInvoice"> | string
-    templateInvoiceId?: StringNullableWithAggregatesFilter<"RecurringInvoice"> | string | null
+    templateInvoiceId?: StringWithAggregatesFilter<"RecurringInvoice"> | string
     frequency?: EnumRecurringFrequencyWithAggregatesFilter<"RecurringInvoice"> | $Enums.RecurringFrequency
     interval?: IntWithAggregatesFilter<"RecurringInvoice"> | number
     startAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
-    endAt?: DateTimeNullableWithAggregatesFilter<"RecurringInvoice"> | Date | string | null
     nextRunAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
+    endAt?: DateTimeNullableWithAggregatesFilter<"RecurringInvoice"> | Date | string | null
     isActive?: BoolWithAggregatesFilter<"RecurringInvoice"> | boolean
+    lastRunAt?: DateTimeNullableWithAggregatesFilter<"RecurringInvoice"> | Date | string | null
+    occurrenceCount?: IntWithAggregatesFilter<"RecurringInvoice"> | number
     createdAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
   }
@@ -16647,7 +16684,7 @@ export namespace Prisma {
     items?: InvoiceItemCreateNestedManyWithoutInvoiceInput
     payments?: PaymentCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUncheckedCreateInput = {
@@ -16670,7 +16707,7 @@ export namespace Prisma {
     items?: InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
     payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailUncheckedCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUpdateInput = {
@@ -16693,7 +16730,7 @@ export namespace Prisma {
     items?: InvoiceItemUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateInput = {
@@ -16716,7 +16753,7 @@ export namespace Prisma {
     items?: InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUncheckedUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceCreateManyInput = {
@@ -17072,30 +17109,34 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateInput = {
     id?: string
-    frequency: $Enums.RecurringFrequency
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRecurringInput
     client: ClientCreateNestedOneWithoutRecurringInput
-    templateInvoice?: InvoiceCreateNestedOneWithoutRecurringAsTemplateInput
+    templateInvoice: InvoiceCreateNestedOneWithoutRecurringTemplateInput
   }
 
   export type RecurringInvoiceUncheckedCreateInput = {
     id?: string
     userId: string
     clientId: string
-    templateInvoiceId?: string | null
-    frequency: $Enums.RecurringFrequency
+    templateInvoiceId: string
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17105,27 +17146,31 @@ export namespace Prisma {
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRecurringNestedInput
     client?: ClientUpdateOneRequiredWithoutRecurringNestedInput
-    templateInvoice?: InvoiceUpdateOneWithoutRecurringAsTemplateNestedInput
+    templateInvoice?: InvoiceUpdateOneRequiredWithoutRecurringTemplateNestedInput
   }
 
   export type RecurringInvoiceUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
-    templateInvoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    templateInvoiceId?: StringFieldUpdateOperationsInput | string
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17134,13 +17179,15 @@ export namespace Prisma {
     id?: string
     userId: string
     clientId: string
-    templateInvoiceId?: string | null
-    frequency: $Enums.RecurringFrequency
+    templateInvoiceId: string
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17150,9 +17197,11 @@ export namespace Prisma {
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17161,13 +17210,15 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
-    templateInvoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    templateInvoiceId?: StringFieldUpdateOperationsInput | string
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17625,11 +17676,6 @@ export namespace Prisma {
     none?: InvoiceEmailWhereInput
   }
 
-  export type RecurringInvoiceNullableScalarRelationFilter = {
-    is?: RecurringInvoiceWhereInput | null
-    isNot?: RecurringInvoiceWhereInput | null
-  }
-
   export type InvoiceEmailOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -17943,11 +17989,6 @@ export namespace Prisma {
     not?: NestedEnumRecurringFrequencyFilter<$PrismaModel> | $Enums.RecurringFrequency
   }
 
-  export type InvoiceNullableScalarRelationFilter = {
-    is?: InvoiceWhereInput | null
-    isNot?: InvoiceWhereInput | null
-  }
-
   export type RecurringInvoiceCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -17956,15 +17997,18 @@ export namespace Prisma {
     frequency?: SortOrder
     interval?: SortOrder
     startAt?: SortOrder
-    endAt?: SortOrder
     nextRunAt?: SortOrder
+    endAt?: SortOrder
     isActive?: SortOrder
+    lastRunAt?: SortOrder
+    occurrenceCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type RecurringInvoiceAvgOrderByAggregateInput = {
     interval?: SortOrder
+    occurrenceCount?: SortOrder
   }
 
   export type RecurringInvoiceMaxOrderByAggregateInput = {
@@ -17975,9 +18019,11 @@ export namespace Prisma {
     frequency?: SortOrder
     interval?: SortOrder
     startAt?: SortOrder
-    endAt?: SortOrder
     nextRunAt?: SortOrder
+    endAt?: SortOrder
     isActive?: SortOrder
+    lastRunAt?: SortOrder
+    occurrenceCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -17990,15 +18036,18 @@ export namespace Prisma {
     frequency?: SortOrder
     interval?: SortOrder
     startAt?: SortOrder
-    endAt?: SortOrder
     nextRunAt?: SortOrder
+    endAt?: SortOrder
     isActive?: SortOrder
+    lastRunAt?: SortOrder
+    occurrenceCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type RecurringInvoiceSumOrderByAggregateInput = {
     interval?: SortOrder
+    occurrenceCount?: SortOrder
   }
 
   export type EnumRecurringFrequencyWithAggregatesFilter<$PrismaModel = never> = {
@@ -18596,10 +18645,11 @@ export namespace Prisma {
     connect?: InvoiceEmailWhereUniqueInput | InvoiceEmailWhereUniqueInput[]
   }
 
-  export type RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput = {
-    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput>
-    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput
-    connect?: RecurringInvoiceWhereUniqueInput
+  export type RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput = {
+    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput> | RecurringInvoiceCreateWithoutTemplateInvoiceInput[] | RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput[]
+    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput | RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput[]
+    createMany?: RecurringInvoiceCreateManyTemplateInvoiceInputEnvelope
+    connect?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
   }
 
   export type InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput = {
@@ -18623,10 +18673,11 @@ export namespace Prisma {
     connect?: InvoiceEmailWhereUniqueInput | InvoiceEmailWhereUniqueInput[]
   }
 
-  export type RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput = {
-    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput>
-    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput
-    connect?: RecurringInvoiceWhereUniqueInput
+  export type RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput = {
+    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput> | RecurringInvoiceCreateWithoutTemplateInvoiceInput[] | RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput[]
+    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput | RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput[]
+    createMany?: RecurringInvoiceCreateManyTemplateInvoiceInputEnvelope
+    connect?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
   }
 
   export type EnumInvoiceStatusFieldUpdateOperationsInput = {
@@ -18691,14 +18742,18 @@ export namespace Prisma {
     deleteMany?: InvoiceEmailScalarWhereInput | InvoiceEmailScalarWhereInput[]
   }
 
-  export type RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput = {
-    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput>
-    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput
-    upsert?: RecurringInvoiceUpsertWithoutTemplateInvoiceInput
-    disconnect?: RecurringInvoiceWhereInput | boolean
-    delete?: RecurringInvoiceWhereInput | boolean
-    connect?: RecurringInvoiceWhereUniqueInput
-    update?: XOR<XOR<RecurringInvoiceUpdateToOneWithWhereWithoutTemplateInvoiceInput, RecurringInvoiceUpdateWithoutTemplateInvoiceInput>, RecurringInvoiceUncheckedUpdateWithoutTemplateInvoiceInput>
+  export type RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput = {
+    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput> | RecurringInvoiceCreateWithoutTemplateInvoiceInput[] | RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput[]
+    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput | RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput[]
+    upsert?: RecurringInvoiceUpsertWithWhereUniqueWithoutTemplateInvoiceInput | RecurringInvoiceUpsertWithWhereUniqueWithoutTemplateInvoiceInput[]
+    createMany?: RecurringInvoiceCreateManyTemplateInvoiceInputEnvelope
+    set?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    disconnect?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    delete?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    connect?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    update?: RecurringInvoiceUpdateWithWhereUniqueWithoutTemplateInvoiceInput | RecurringInvoiceUpdateWithWhereUniqueWithoutTemplateInvoiceInput[]
+    updateMany?: RecurringInvoiceUpdateManyWithWhereWithoutTemplateInvoiceInput | RecurringInvoiceUpdateManyWithWhereWithoutTemplateInvoiceInput[]
+    deleteMany?: RecurringInvoiceScalarWhereInput | RecurringInvoiceScalarWhereInput[]
   }
 
   export type InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput = {
@@ -18743,14 +18798,18 @@ export namespace Prisma {
     deleteMany?: InvoiceEmailScalarWhereInput | InvoiceEmailScalarWhereInput[]
   }
 
-  export type RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput = {
-    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput>
-    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput
-    upsert?: RecurringInvoiceUpsertWithoutTemplateInvoiceInput
-    disconnect?: RecurringInvoiceWhereInput | boolean
-    delete?: RecurringInvoiceWhereInput | boolean
-    connect?: RecurringInvoiceWhereUniqueInput
-    update?: XOR<XOR<RecurringInvoiceUpdateToOneWithWhereWithoutTemplateInvoiceInput, RecurringInvoiceUpdateWithoutTemplateInvoiceInput>, RecurringInvoiceUncheckedUpdateWithoutTemplateInvoiceInput>
+  export type RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput = {
+    create?: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput> | RecurringInvoiceCreateWithoutTemplateInvoiceInput[] | RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput[]
+    connectOrCreate?: RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput | RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput[]
+    upsert?: RecurringInvoiceUpsertWithWhereUniqueWithoutTemplateInvoiceInput | RecurringInvoiceUpsertWithWhereUniqueWithoutTemplateInvoiceInput[]
+    createMany?: RecurringInvoiceCreateManyTemplateInvoiceInputEnvelope
+    set?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    disconnect?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    delete?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    connect?: RecurringInvoiceWhereUniqueInput | RecurringInvoiceWhereUniqueInput[]
+    update?: RecurringInvoiceUpdateWithWhereUniqueWithoutTemplateInvoiceInput | RecurringInvoiceUpdateWithWhereUniqueWithoutTemplateInvoiceInput[]
+    updateMany?: RecurringInvoiceUpdateManyWithWhereWithoutTemplateInvoiceInput | RecurringInvoiceUpdateManyWithWhereWithoutTemplateInvoiceInput[]
+    deleteMany?: RecurringInvoiceScalarWhereInput | RecurringInvoiceScalarWhereInput[]
   }
 
   export type InvoiceCreateNestedOneWithoutItemsInput = {
@@ -18849,9 +18908,9 @@ export namespace Prisma {
     connect?: ClientWhereUniqueInput
   }
 
-  export type InvoiceCreateNestedOneWithoutRecurringAsTemplateInput = {
-    create?: XOR<InvoiceCreateWithoutRecurringAsTemplateInput, InvoiceUncheckedCreateWithoutRecurringAsTemplateInput>
-    connectOrCreate?: InvoiceCreateOrConnectWithoutRecurringAsTemplateInput
+  export type InvoiceCreateNestedOneWithoutRecurringTemplateInput = {
+    create?: XOR<InvoiceCreateWithoutRecurringTemplateInput, InvoiceUncheckedCreateWithoutRecurringTemplateInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutRecurringTemplateInput
     connect?: InvoiceWhereUniqueInput
   }
 
@@ -18875,14 +18934,12 @@ export namespace Prisma {
     update?: XOR<XOR<ClientUpdateToOneWithWhereWithoutRecurringInput, ClientUpdateWithoutRecurringInput>, ClientUncheckedUpdateWithoutRecurringInput>
   }
 
-  export type InvoiceUpdateOneWithoutRecurringAsTemplateNestedInput = {
-    create?: XOR<InvoiceCreateWithoutRecurringAsTemplateInput, InvoiceUncheckedCreateWithoutRecurringAsTemplateInput>
-    connectOrCreate?: InvoiceCreateOrConnectWithoutRecurringAsTemplateInput
-    upsert?: InvoiceUpsertWithoutRecurringAsTemplateInput
-    disconnect?: InvoiceWhereInput | boolean
-    delete?: InvoiceWhereInput | boolean
+  export type InvoiceUpdateOneRequiredWithoutRecurringTemplateNestedInput = {
+    create?: XOR<InvoiceCreateWithoutRecurringTemplateInput, InvoiceUncheckedCreateWithoutRecurringTemplateInput>
+    connectOrCreate?: InvoiceCreateOrConnectWithoutRecurringTemplateInput
+    upsert?: InvoiceUpsertWithoutRecurringTemplateInput
     connect?: InvoiceWhereUniqueInput
-    update?: XOR<XOR<InvoiceUpdateToOneWithWhereWithoutRecurringAsTemplateInput, InvoiceUpdateWithoutRecurringAsTemplateInput>, InvoiceUncheckedUpdateWithoutRecurringAsTemplateInput>
+    update?: XOR<XOR<InvoiceUpdateToOneWithWhereWithoutRecurringTemplateInput, InvoiceUpdateWithoutRecurringTemplateInput>, InvoiceUncheckedUpdateWithoutRecurringTemplateInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -19315,7 +19372,7 @@ export namespace Prisma {
     items?: InvoiceItemCreateNestedManyWithoutInvoiceInput
     payments?: PaymentCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUncheckedCreateWithoutUserInput = {
@@ -19337,7 +19394,7 @@ export namespace Prisma {
     items?: InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
     payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailUncheckedCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceCreateOrConnectWithoutUserInput = {
@@ -19352,28 +19409,32 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateWithoutUserInput = {
     id?: string
-    frequency: $Enums.RecurringFrequency
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     client: ClientCreateNestedOneWithoutRecurringInput
-    templateInvoice?: InvoiceCreateNestedOneWithoutRecurringAsTemplateInput
+    templateInvoice: InvoiceCreateNestedOneWithoutRecurringTemplateInput
   }
 
   export type RecurringInvoiceUncheckedCreateWithoutUserInput = {
     id?: string
     clientId: string
-    templateInvoiceId?: string | null
-    frequency: $Enums.RecurringFrequency
+    templateInvoiceId: string
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19603,13 +19664,15 @@ export namespace Prisma {
     id?: StringFilter<"RecurringInvoice"> | string
     userId?: StringFilter<"RecurringInvoice"> | string
     clientId?: StringFilter<"RecurringInvoice"> | string
-    templateInvoiceId?: StringNullableFilter<"RecurringInvoice"> | string | null
+    templateInvoiceId?: StringFilter<"RecurringInvoice"> | string
     frequency?: EnumRecurringFrequencyFilter<"RecurringInvoice"> | $Enums.RecurringFrequency
     interval?: IntFilter<"RecurringInvoice"> | number
     startAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
-    endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
     nextRunAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
+    endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
     isActive?: BoolFilter<"RecurringInvoice"> | boolean
+    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    occurrenceCount?: IntFilter<"RecurringInvoice"> | number
     createdAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
   }
@@ -19750,7 +19813,7 @@ export namespace Prisma {
     items?: InvoiceItemCreateNestedManyWithoutInvoiceInput
     payments?: PaymentCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUncheckedCreateWithoutClientInput = {
@@ -19772,7 +19835,7 @@ export namespace Prisma {
     items?: InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
     payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailUncheckedCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceCreateOrConnectWithoutClientInput = {
@@ -19787,28 +19850,32 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateWithoutClientInput = {
     id?: string
-    frequency: $Enums.RecurringFrequency
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRecurringInput
-    templateInvoice?: InvoiceCreateNestedOneWithoutRecurringAsTemplateInput
+    templateInvoice: InvoiceCreateNestedOneWithoutRecurringTemplateInput
   }
 
   export type RecurringInvoiceUncheckedCreateWithoutClientInput = {
     id?: string
     userId: string
-    templateInvoiceId?: string | null
-    frequency: $Enums.RecurringFrequency
+    templateInvoiceId: string
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20396,12 +20463,14 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateWithoutTemplateInvoiceInput = {
     id?: string
-    frequency: $Enums.RecurringFrequency
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRecurringInput
@@ -20412,12 +20481,14 @@ export namespace Prisma {
     id?: string
     userId: string
     clientId: string
-    frequency: $Enums.RecurringFrequency
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20425,6 +20496,11 @@ export namespace Prisma {
   export type RecurringInvoiceCreateOrConnectWithoutTemplateInvoiceInput = {
     where: RecurringInvoiceWhereUniqueInput
     create: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput>
+  }
+
+  export type RecurringInvoiceCreateManyTemplateInvoiceInputEnvelope = {
+    data: RecurringInvoiceCreateManyTemplateInvoiceInput | RecurringInvoiceCreateManyTemplateInvoiceInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutInvoicesInput = {
@@ -20571,43 +20647,20 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"InvoiceEmail"> | Date | string
   }
 
-  export type RecurringInvoiceUpsertWithoutTemplateInvoiceInput = {
+  export type RecurringInvoiceUpsertWithWhereUniqueWithoutTemplateInvoiceInput = {
+    where: RecurringInvoiceWhereUniqueInput
     update: XOR<RecurringInvoiceUpdateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedUpdateWithoutTemplateInvoiceInput>
     create: XOR<RecurringInvoiceCreateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedCreateWithoutTemplateInvoiceInput>
-    where?: RecurringInvoiceWhereInput
   }
 
-  export type RecurringInvoiceUpdateToOneWithWhereWithoutTemplateInvoiceInput = {
-    where?: RecurringInvoiceWhereInput
+  export type RecurringInvoiceUpdateWithWhereUniqueWithoutTemplateInvoiceInput = {
+    where: RecurringInvoiceWhereUniqueInput
     data: XOR<RecurringInvoiceUpdateWithoutTemplateInvoiceInput, RecurringInvoiceUncheckedUpdateWithoutTemplateInvoiceInput>
   }
 
-  export type RecurringInvoiceUpdateWithoutTemplateInvoiceInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
-    interval?: IntFieldUpdateOperationsInput | number
-    startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutRecurringNestedInput
-    client?: ClientUpdateOneRequiredWithoutRecurringNestedInput
-  }
-
-  export type RecurringInvoiceUncheckedUpdateWithoutTemplateInvoiceInput = {
-    id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
-    clientId?: StringFieldUpdateOperationsInput | string
-    frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
-    interval?: IntFieldUpdateOperationsInput | number
-    startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  export type RecurringInvoiceUpdateManyWithWhereWithoutTemplateInvoiceInput = {
+    where: RecurringInvoiceScalarWhereInput
+    data: XOR<RecurringInvoiceUpdateManyMutationInput, RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceInput>
   }
 
   export type InvoiceCreateWithoutItemsInput = {
@@ -20629,7 +20682,7 @@ export namespace Prisma {
     client: ClientCreateNestedOneWithoutInvoicesInput
     payments?: PaymentCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUncheckedCreateWithoutItemsInput = {
@@ -20651,7 +20704,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailUncheckedCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceCreateOrConnectWithoutItemsInput = {
@@ -20722,7 +20775,7 @@ export namespace Prisma {
     client?: ClientUpdateOneRequiredWithoutInvoicesNestedInput
     payments?: PaymentUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutItemsInput = {
@@ -20744,7 +20797,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUncheckedUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type ProductUpsertWithoutItemsInput = {
@@ -20805,7 +20858,7 @@ export namespace Prisma {
     client: ClientCreateNestedOneWithoutInvoicesInput
     items?: InvoiceItemCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUncheckedCreateWithoutPaymentsInput = {
@@ -20827,7 +20880,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     items?: InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
     emails?: InvoiceEmailUncheckedCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceCreateOrConnectWithoutPaymentsInput = {
@@ -20902,7 +20955,7 @@ export namespace Prisma {
     client?: ClientUpdateOneRequiredWithoutInvoicesNestedInput
     items?: InvoiceItemUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutPaymentsInput = {
@@ -20924,7 +20977,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUncheckedUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type UserUpsertWithoutPaymentsInput = {
@@ -20989,7 +21042,7 @@ export namespace Prisma {
     client: ClientCreateNestedOneWithoutInvoicesInput
     items?: InvoiceItemCreateNestedManyWithoutInvoiceInput
     payments?: PaymentCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceUncheckedCreateWithoutEmailsInput = {
@@ -21011,7 +21064,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     items?: InvoiceItemUncheckedCreateNestedManyWithoutInvoiceInput
     payments?: PaymentUncheckedCreateNestedManyWithoutInvoiceInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedCreateNestedOneWithoutTemplateInvoiceInput
+    recurringTemplate?: RecurringInvoiceUncheckedCreateNestedManyWithoutTemplateInvoiceInput
   }
 
   export type InvoiceCreateOrConnectWithoutEmailsInput = {
@@ -21049,7 +21102,7 @@ export namespace Prisma {
     client?: ClientUpdateOneRequiredWithoutInvoicesNestedInput
     items?: InvoiceItemUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutEmailsInput = {
@@ -21071,7 +21124,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     items?: InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type UserCreateWithoutRecurringInput = {
@@ -21144,7 +21197,7 @@ export namespace Prisma {
     create: XOR<ClientCreateWithoutRecurringInput, ClientUncheckedCreateWithoutRecurringInput>
   }
 
-  export type InvoiceCreateWithoutRecurringAsTemplateInput = {
+  export type InvoiceCreateWithoutRecurringTemplateInput = {
     id?: string
     invoiceNumber: string
     issueDate: Date | string
@@ -21166,7 +21219,7 @@ export namespace Prisma {
     emails?: InvoiceEmailCreateNestedManyWithoutInvoiceInput
   }
 
-  export type InvoiceUncheckedCreateWithoutRecurringAsTemplateInput = {
+  export type InvoiceUncheckedCreateWithoutRecurringTemplateInput = {
     id?: string
     userId: string
     clientId: string
@@ -21188,9 +21241,9 @@ export namespace Prisma {
     emails?: InvoiceEmailUncheckedCreateNestedManyWithoutInvoiceInput
   }
 
-  export type InvoiceCreateOrConnectWithoutRecurringAsTemplateInput = {
+  export type InvoiceCreateOrConnectWithoutRecurringTemplateInput = {
     where: InvoiceWhereUniqueInput
-    create: XOR<InvoiceCreateWithoutRecurringAsTemplateInput, InvoiceUncheckedCreateWithoutRecurringAsTemplateInput>
+    create: XOR<InvoiceCreateWithoutRecurringTemplateInput, InvoiceUncheckedCreateWithoutRecurringTemplateInput>
   }
 
   export type UserUpsertWithoutRecurringInput = {
@@ -21275,18 +21328,18 @@ export namespace Prisma {
     invoices?: InvoiceUncheckedUpdateManyWithoutClientNestedInput
   }
 
-  export type InvoiceUpsertWithoutRecurringAsTemplateInput = {
-    update: XOR<InvoiceUpdateWithoutRecurringAsTemplateInput, InvoiceUncheckedUpdateWithoutRecurringAsTemplateInput>
-    create: XOR<InvoiceCreateWithoutRecurringAsTemplateInput, InvoiceUncheckedCreateWithoutRecurringAsTemplateInput>
+  export type InvoiceUpsertWithoutRecurringTemplateInput = {
+    update: XOR<InvoiceUpdateWithoutRecurringTemplateInput, InvoiceUncheckedUpdateWithoutRecurringTemplateInput>
+    create: XOR<InvoiceCreateWithoutRecurringTemplateInput, InvoiceUncheckedCreateWithoutRecurringTemplateInput>
     where?: InvoiceWhereInput
   }
 
-  export type InvoiceUpdateToOneWithWhereWithoutRecurringAsTemplateInput = {
+  export type InvoiceUpdateToOneWithWhereWithoutRecurringTemplateInput = {
     where?: InvoiceWhereInput
-    data: XOR<InvoiceUpdateWithoutRecurringAsTemplateInput, InvoiceUncheckedUpdateWithoutRecurringAsTemplateInput>
+    data: XOR<InvoiceUpdateWithoutRecurringTemplateInput, InvoiceUncheckedUpdateWithoutRecurringTemplateInput>
   }
 
-  export type InvoiceUpdateWithoutRecurringAsTemplateInput = {
+  export type InvoiceUpdateWithoutRecurringTemplateInput = {
     id?: StringFieldUpdateOperationsInput | string
     invoiceNumber?: StringFieldUpdateOperationsInput | string
     issueDate?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -21308,7 +21361,7 @@ export namespace Prisma {
     emails?: InvoiceEmailUpdateManyWithoutInvoiceNestedInput
   }
 
-  export type InvoiceUncheckedUpdateWithoutRecurringAsTemplateInput = {
+  export type InvoiceUncheckedUpdateWithoutRecurringTemplateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
@@ -21394,13 +21447,15 @@ export namespace Prisma {
   export type RecurringInvoiceCreateManyUserInput = {
     id?: string
     clientId: string
-    templateInvoiceId?: string | null
-    frequency: $Enums.RecurringFrequency
+    templateInvoiceId: string
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21561,7 +21616,7 @@ export namespace Prisma {
     items?: InvoiceItemUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutUserInput = {
@@ -21583,7 +21638,7 @@ export namespace Prisma {
     items?: InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUncheckedUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateManyWithoutUserInput = {
@@ -21609,25 +21664,29 @@ export namespace Prisma {
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     client?: ClientUpdateOneRequiredWithoutRecurringNestedInput
-    templateInvoice?: InvoiceUpdateOneWithoutRecurringAsTemplateNestedInput
+    templateInvoice?: InvoiceUpdateOneRequiredWithoutRecurringTemplateNestedInput
   }
 
   export type RecurringInvoiceUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
-    templateInvoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    templateInvoiceId?: StringFieldUpdateOperationsInput | string
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21635,13 +21694,15 @@ export namespace Prisma {
   export type RecurringInvoiceUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     clientId?: StringFieldUpdateOperationsInput | string
-    templateInvoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    templateInvoiceId?: StringFieldUpdateOperationsInput | string
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21667,13 +21728,15 @@ export namespace Prisma {
   export type RecurringInvoiceCreateManyClientInput = {
     id?: string
     userId: string
-    templateInvoiceId?: string | null
-    frequency: $Enums.RecurringFrequency
+    templateInvoiceId: string
+    frequency?: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
-    endAt?: Date | string | null
     nextRunAt: Date | string
+    endAt?: Date | string | null
     isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21697,7 +21760,7 @@ export namespace Prisma {
     items?: InvoiceItemUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateWithoutClientInput = {
@@ -21719,7 +21782,7 @@ export namespace Prisma {
     items?: InvoiceItemUncheckedUpdateManyWithoutInvoiceNestedInput
     payments?: PaymentUncheckedUpdateManyWithoutInvoiceNestedInput
     emails?: InvoiceEmailUncheckedUpdateManyWithoutInvoiceNestedInput
-    recurringAsTemplate?: RecurringInvoiceUncheckedUpdateOneWithoutTemplateInvoiceNestedInput
+    recurringTemplate?: RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceNestedInput
   }
 
   export type InvoiceUncheckedUpdateManyWithoutClientInput = {
@@ -21745,25 +21808,29 @@ export namespace Prisma {
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRecurringNestedInput
-    templateInvoice?: InvoiceUpdateOneWithoutRecurringAsTemplateNestedInput
+    templateInvoice?: InvoiceUpdateOneRequiredWithoutRecurringTemplateNestedInput
   }
 
   export type RecurringInvoiceUncheckedUpdateWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    templateInvoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    templateInvoiceId?: StringFieldUpdateOperationsInput | string
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21771,13 +21838,15 @@ export namespace Prisma {
   export type RecurringInvoiceUncheckedUpdateManyWithoutClientInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
-    templateInvoiceId?: NullableStringFieldUpdateOperationsInput | string | null
+    templateInvoiceId?: StringFieldUpdateOperationsInput | string
     frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
     interval?: IntFieldUpdateOperationsInput | number
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21916,6 +21985,22 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type RecurringInvoiceCreateManyTemplateInvoiceInput = {
+    id?: string
+    userId: string
+    clientId: string
+    frequency?: $Enums.RecurringFrequency
+    interval?: number
+    startAt: Date | string
+    nextRunAt: Date | string
+    endAt?: Date | string | null
+    isActive?: boolean
+    lastRunAt?: Date | string | null
+    occurrenceCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type InvoiceItemUpdateWithoutInvoiceInput = {
     id?: StringFieldUpdateOperationsInput | string
     itemName?: StringFieldUpdateOperationsInput | string
@@ -22010,6 +22095,54 @@ export namespace Prisma {
     sentAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RecurringInvoiceUpdateWithoutTemplateInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
+    interval?: IntFieldUpdateOperationsInput | number
+    startAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutRecurringNestedInput
+    client?: ClientUpdateOneRequiredWithoutRecurringNestedInput
+  }
+
+  export type RecurringInvoiceUncheckedUpdateWithoutTemplateInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
+    interval?: IntFieldUpdateOperationsInput | number
+    startAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type RecurringInvoiceUncheckedUpdateManyWithoutTemplateInvoiceInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    clientId?: StringFieldUpdateOperationsInput | string
+    frequency?: EnumRecurringFrequencyFieldUpdateOperationsInput | $Enums.RecurringFrequency
+    interval?: IntFieldUpdateOperationsInput | number
+    startAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    occurrenceCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

@@ -141,7 +141,7 @@ model Invoice {
   items               InvoiceItem[]
   payments            Payment[]
   emails              InvoiceEmail[]
-  recurringAsTemplate RecurringInvoice? @relation("RecurringTemplate")
+  recurringTemplate RecurringInvoice[] @relation("RecurringTemplate")
 
   @@unique([userId, invoiceNumber])
   @@index([userId])
@@ -218,26 +218,32 @@ model InvoiceCounter {
 }
 
 model RecurringInvoice {
-  id                String             @id @default(cuid())
+  id                String   @id @default(cuid())
   userId            String
   clientId          String
-  templateInvoiceId String?            @unique
-  frequency         RecurringFrequency
+  templateInvoiceId String
+
+  frequency         RecurringFrequency @default(MONTHLY)
   interval          Int                @default(1)
+
   startAt           DateTime
-  endAt             DateTime?
   nextRunAt         DateTime
-  isActive          Boolean            @default(true)
-  createdAt         DateTime           @default(now())
-  updatedAt         DateTime           @updatedAt
+  endAt             DateTime?
+  isActive          Boolean @default(true)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  client Client @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  lastRunAt         DateTime?
+  occurrenceCount   Int      @default(0)
 
-  templateInvoice Invoice? @relation("RecurringTemplate", fields: [templateInvoiceId], references: [id], onDelete: SetNull)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
-  @@index([userId])
-  @@index([clientId])
-  @@index([nextRunAt])
-  @@index([isActive])
+  user              User     @relation(fields: [userId], references: [id])
+  client            Client   @relation(fields: [clientId], references: [id])
+
+  // ✅ ini yang kamu punya
+  templateInvoice   Invoice  @relation("RecurringTemplate", fields: [templateInvoiceId], references: [id])
+
+  @@index([userId, isActive, nextRunAt])
+  @@index([userId, clientId])
+  @@index([userId, templateInvoiceId])
 }

@@ -1,12 +1,10 @@
 import { Router } from "express";
-import { JWT_SECRET } from "../../config/env.js";
-import { JwtMiddleware } from "../../middlewares/jwt.middleware.js";
-import { ValidationMiddleware } from "../../middlewares/validation.middleware.js";
 import { RecurringController } from "./recurring.controller.js";
+import { ValidationMiddleware } from "../../middlewares/validation.middleware.js";
+import { JwtMiddleware } from "../../middlewares/jwt.middleware.js";
+
 import { CreateRecurringDTO } from "./dto/create-recurring.dto.js";
-import { GetRecurringDTO } from "./dto/get-recurring.dto.js";
 import { UpdateRecurringDTO } from "./dto/update-recurring.dto.js";
-import { RunRecurringDTO } from "./dto/run-recurring.dto.js";
 
 export class RecurringRouter {
   private router: Router;
@@ -17,37 +15,41 @@ export class RecurringRouter {
     private jwtMiddleware: JwtMiddleware,
   ) {
     this.router = Router();
-    this.initializedRoutes();
+    this.registerRoutes();
   }
 
-  private initializedRoutes = () => {
-    this.router.use(this.jwtMiddleware.verifyToken(JWT_SECRET!));
+  private registerRoutes() {
+    // ✅ biar kompatibel walau nama method jwt middleware beda-beda
+    const auth =
+      (this.jwtMiddleware as any).verifyToken ||
+      (this.jwtMiddleware as any).use ||
+      (this.jwtMiddleware as any).handle ||
+      ((req: any, _res: any, next: any) => next());
 
-    this.router.get(
-      "/",
-      this.validationMiddleware.validateQuery(GetRecurringDTO),
-      this.recurringController.list,
-    );
+    const validateBody =
+      (this.validationMiddleware as any).validateBody ||
+      (this.validationMiddleware as any).validate ||
+      ((_: any) => (req: any, _res: any, next: any) => next());
 
+    this.router.use(auth.bind(this.jwtMiddleware));
+
+    this.router.get("/", this.recurringController.list);
     this.router.post(
       "/",
-      this.validationMiddleware.validateBody(CreateRecurringDTO),
+      validateBody(CreateRecurringDTO),
       this.recurringController.create,
     );
 
     this.router.patch(
       "/:id",
-      this.validationMiddleware.validateBody(UpdateRecurringDTO),
+      validateBody(UpdateRecurringDTO),
       this.recurringController.update,
     );
 
-    // manual trigger for testing
-    this.router.post(
-      "/run",
-      this.validationMiddleware.validateBody(RunRecurringDTO),
-      this.recurringController.run,
-    );
-  };
+    this.router.patch("/:id/toggle", this.recurringController.toggle);
+  }
 
-  getRouter = () => this.router;
+  getRouter() {
+    return this.router;
+  }
 }

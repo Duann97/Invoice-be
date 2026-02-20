@@ -2,6 +2,7 @@ import {
   IsBoolean,
   IsIn,
   IsInt,
+  IsISO8601,
   IsOptional,
   IsString,
   Min,
@@ -9,32 +10,26 @@ import {
 
 export class CreateRecurringDTO {
   @IsString()
-  clientId!: string; // cuid
+  clientId!: string;
 
-  @IsOptional()
   @IsString()
-  templateInvoiceId?: string; // cuid
+  templateInvoiceId!: string;
 
   @IsIn(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"])
   frequency!: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
 
-  @IsOptional()
   @IsInt()
   @Min(1)
-  interval?: number = 1;
+  interval!: number;
 
-  @IsString()
-  startAt!: string; // ISO string
-
-  @IsOptional()
-  @IsString()
-  endAt?: string; // ISO string
+  @IsISO8601()
+  startAt!: string;
 
   @IsOptional()
-  @IsString()
-  nextRunAt?: string; // ISO string
+  @IsISO8601()
+  endAt?: string;
 
   @IsOptional()
   @IsBoolean()
-  isActive?: boolean = true;
+  isActive?: boolean;
 }

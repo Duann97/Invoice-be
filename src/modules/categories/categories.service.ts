@@ -50,7 +50,6 @@ export class CategoriesService {
     if (!category) throw new ApiError("Category not found", 404);
     if (category.deletedAt) throw new ApiError("Category already deleted", 400);
 
-    // optional: prevent duplicate rename
     if (body.name) {
       const duplicate = await this.prisma.category.findFirst({
         where: {
