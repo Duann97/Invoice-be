@@ -1,12 +1,19 @@
 import {
   IsBoolean,
-  IsIn,
+  IsEnum,
   IsInt,
   IsISO8601,
   IsOptional,
   IsString,
   Min,
 } from "class-validator";
+
+export enum RecurringFrequencyDTO {
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY",
+}
 
 export class CreateRecurringDTO {
   @IsString()
@@ -15,8 +22,8 @@ export class CreateRecurringDTO {
   @IsString()
   templateInvoiceId!: string;
 
-  @IsIn(["DAILY", "WEEKLY", "MONTHLY", "YEARLY"])
-  frequency!: "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+  @IsEnum(RecurringFrequencyDTO)
+  frequency!: RecurringFrequencyDTO;
 
   @IsInt()
   @Min(1)
@@ -28,6 +35,11 @@ export class CreateRecurringDTO {
   @IsOptional()
   @IsISO8601()
   endAt?: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(1)
+  maxOccurrences?: number;
 
   @IsOptional()
   @IsBoolean()

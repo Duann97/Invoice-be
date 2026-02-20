@@ -249,9 +249,10 @@ exports.Prisma.RecurringInvoiceScalarFieldEnum = {
   startAt: 'startAt',
   nextRunAt: 'nextRunAt',
   endAt: 'endAt',
-  isActive: 'isActive',
-  lastRunAt: 'lastRunAt',
+  maxOccurrences: 'maxOccurrences',
   occurrenceCount: 'occurrenceCount',
+  lastRunAt: 'lastRunAt',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

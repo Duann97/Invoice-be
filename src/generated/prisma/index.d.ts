@@ -13759,11 +13759,13 @@ export namespace Prisma {
 
   export type RecurringInvoiceAvgAggregateOutputType = {
     interval: number | null
+    maxOccurrences: number | null
     occurrenceCount: number | null
   }
 
   export type RecurringInvoiceSumAggregateOutputType = {
     interval: number | null
+    maxOccurrences: number | null
     occurrenceCount: number | null
   }
 
@@ -13777,9 +13779,10 @@ export namespace Prisma {
     startAt: Date | null
     nextRunAt: Date | null
     endAt: Date | null
-    isActive: boolean | null
-    lastRunAt: Date | null
+    maxOccurrences: number | null
     occurrenceCount: number | null
+    lastRunAt: Date | null
+    isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13794,9 +13797,10 @@ export namespace Prisma {
     startAt: Date | null
     nextRunAt: Date | null
     endAt: Date | null
-    isActive: boolean | null
-    lastRunAt: Date | null
+    maxOccurrences: number | null
     occurrenceCount: number | null
+    lastRunAt: Date | null
+    isActive: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -13811,9 +13815,10 @@ export namespace Prisma {
     startAt: number
     nextRunAt: number
     endAt: number
-    isActive: number
-    lastRunAt: number
+    maxOccurrences: number
     occurrenceCount: number
+    lastRunAt: number
+    isActive: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -13822,11 +13827,13 @@ export namespace Prisma {
 
   export type RecurringInvoiceAvgAggregateInputType = {
     interval?: true
+    maxOccurrences?: true
     occurrenceCount?: true
   }
 
   export type RecurringInvoiceSumAggregateInputType = {
     interval?: true
+    maxOccurrences?: true
     occurrenceCount?: true
   }
 
@@ -13840,9 +13847,10 @@ export namespace Prisma {
     startAt?: true
     nextRunAt?: true
     endAt?: true
-    isActive?: true
-    lastRunAt?: true
+    maxOccurrences?: true
     occurrenceCount?: true
+    lastRunAt?: true
+    isActive?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13857,9 +13865,10 @@ export namespace Prisma {
     startAt?: true
     nextRunAt?: true
     endAt?: true
-    isActive?: true
-    lastRunAt?: true
+    maxOccurrences?: true
     occurrenceCount?: true
+    lastRunAt?: true
+    isActive?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -13874,9 +13883,10 @@ export namespace Prisma {
     startAt?: true
     nextRunAt?: true
     endAt?: true
-    isActive?: true
-    lastRunAt?: true
+    maxOccurrences?: true
     occurrenceCount?: true
+    lastRunAt?: true
+    isActive?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -13978,9 +13988,10 @@ export namespace Prisma {
     startAt: Date
     nextRunAt: Date
     endAt: Date | null
-    isActive: boolean
-    lastRunAt: Date | null
+    maxOccurrences: number | null
     occurrenceCount: number
+    lastRunAt: Date | null
+    isActive: boolean
     createdAt: Date
     updatedAt: Date
     _count: RecurringInvoiceCountAggregateOutputType | null
@@ -14014,9 +14025,10 @@ export namespace Prisma {
     startAt?: boolean
     nextRunAt?: boolean
     endAt?: boolean
-    isActive?: boolean
-    lastRunAt?: boolean
+    maxOccurrences?: boolean
     occurrenceCount?: boolean
+    lastRunAt?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14034,9 +14046,10 @@ export namespace Prisma {
     startAt?: boolean
     nextRunAt?: boolean
     endAt?: boolean
-    isActive?: boolean
-    lastRunAt?: boolean
+    maxOccurrences?: boolean
     occurrenceCount?: boolean
+    lastRunAt?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14054,9 +14067,10 @@ export namespace Prisma {
     startAt?: boolean
     nextRunAt?: boolean
     endAt?: boolean
-    isActive?: boolean
-    lastRunAt?: boolean
+    maxOccurrences?: boolean
     occurrenceCount?: boolean
+    lastRunAt?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -14074,14 +14088,15 @@ export namespace Prisma {
     startAt?: boolean
     nextRunAt?: boolean
     endAt?: boolean
-    isActive?: boolean
-    lastRunAt?: boolean
+    maxOccurrences?: boolean
     occurrenceCount?: boolean
+    lastRunAt?: boolean
+    isActive?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type RecurringInvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "clientId" | "templateInvoiceId" | "frequency" | "interval" | "startAt" | "nextRunAt" | "endAt" | "isActive" | "lastRunAt" | "occurrenceCount" | "createdAt" | "updatedAt", ExtArgs["result"]["recurringInvoice"]>
+  export type RecurringInvoiceOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "clientId" | "templateInvoiceId" | "frequency" | "interval" | "startAt" | "nextRunAt" | "endAt" | "maxOccurrences" | "occurrenceCount" | "lastRunAt" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["recurringInvoice"]>
   export type RecurringInvoiceInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     client?: boolean | ClientDefaultArgs<ExtArgs>
@@ -14115,9 +14130,10 @@ export namespace Prisma {
       startAt: Date
       nextRunAt: Date
       endAt: Date | null
-      isActive: boolean
-      lastRunAt: Date | null
+      maxOccurrences: number | null
       occurrenceCount: number
+      lastRunAt: Date | null
+      isActive: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["recurringInvoice"]>
@@ -14555,9 +14571,10 @@ export namespace Prisma {
     readonly startAt: FieldRef<"RecurringInvoice", 'DateTime'>
     readonly nextRunAt: FieldRef<"RecurringInvoice", 'DateTime'>
     readonly endAt: FieldRef<"RecurringInvoice", 'DateTime'>
-    readonly isActive: FieldRef<"RecurringInvoice", 'Boolean'>
-    readonly lastRunAt: FieldRef<"RecurringInvoice", 'DateTime'>
+    readonly maxOccurrences: FieldRef<"RecurringInvoice", 'Int'>
     readonly occurrenceCount: FieldRef<"RecurringInvoice", 'Int'>
+    readonly lastRunAt: FieldRef<"RecurringInvoice", 'DateTime'>
+    readonly isActive: FieldRef<"RecurringInvoice", 'Boolean'>
     readonly createdAt: FieldRef<"RecurringInvoice", 'DateTime'>
     readonly updatedAt: FieldRef<"RecurringInvoice", 'DateTime'>
   }
@@ -15147,9 +15164,10 @@ export namespace Prisma {
     startAt: 'startAt',
     nextRunAt: 'nextRunAt',
     endAt: 'endAt',
-    isActive: 'isActive',
-    lastRunAt: 'lastRunAt',
+    maxOccurrences: 'maxOccurrences',
     occurrenceCount: 'occurrenceCount',
+    lastRunAt: 'lastRunAt',
+    isActive: 'isActive',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -16131,9 +16149,10 @@ export namespace Prisma {
     startAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     nextRunAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
-    isActive?: BoolFilter<"RecurringInvoice"> | boolean
-    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    maxOccurrences?: IntNullableFilter<"RecurringInvoice"> | number | null
     occurrenceCount?: IntFilter<"RecurringInvoice"> | number
+    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    isActive?: BoolFilter<"RecurringInvoice"> | boolean
     createdAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -16151,9 +16170,10 @@ export namespace Prisma {
     startAt?: SortOrder
     nextRunAt?: SortOrder
     endAt?: SortOrderInput | SortOrder
-    isActive?: SortOrder
-    lastRunAt?: SortOrderInput | SortOrder
+    maxOccurrences?: SortOrderInput | SortOrder
     occurrenceCount?: SortOrder
+    lastRunAt?: SortOrderInput | SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -16174,9 +16194,10 @@ export namespace Prisma {
     startAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     nextRunAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
-    isActive?: BoolFilter<"RecurringInvoice"> | boolean
-    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    maxOccurrences?: IntNullableFilter<"RecurringInvoice"> | number | null
     occurrenceCount?: IntFilter<"RecurringInvoice"> | number
+    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    isActive?: BoolFilter<"RecurringInvoice"> | boolean
     createdAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -16194,9 +16215,10 @@ export namespace Prisma {
     startAt?: SortOrder
     nextRunAt?: SortOrder
     endAt?: SortOrderInput | SortOrder
-    isActive?: SortOrder
-    lastRunAt?: SortOrderInput | SortOrder
+    maxOccurrences?: SortOrderInput | SortOrder
     occurrenceCount?: SortOrder
+    lastRunAt?: SortOrderInput | SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: RecurringInvoiceCountOrderByAggregateInput
@@ -16219,9 +16241,10 @@ export namespace Prisma {
     startAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
     nextRunAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
     endAt?: DateTimeNullableWithAggregatesFilter<"RecurringInvoice"> | Date | string | null
-    isActive?: BoolWithAggregatesFilter<"RecurringInvoice"> | boolean
-    lastRunAt?: DateTimeNullableWithAggregatesFilter<"RecurringInvoice"> | Date | string | null
+    maxOccurrences?: IntNullableWithAggregatesFilter<"RecurringInvoice"> | number | null
     occurrenceCount?: IntWithAggregatesFilter<"RecurringInvoice"> | number
+    lastRunAt?: DateTimeNullableWithAggregatesFilter<"RecurringInvoice"> | Date | string | null
+    isActive?: BoolWithAggregatesFilter<"RecurringInvoice"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"RecurringInvoice"> | Date | string
   }
@@ -17109,14 +17132,15 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateInput = {
     id?: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRecurringInput
@@ -17129,14 +17153,15 @@ export namespace Prisma {
     userId: string
     clientId: string
     templateInvoiceId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17148,9 +17173,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRecurringNestedInput
@@ -17168,9 +17194,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17180,14 +17207,15 @@ export namespace Prisma {
     userId: string
     clientId: string
     templateInvoiceId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -17199,9 +17227,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17216,9 +17245,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -17989,6 +18019,17 @@ export namespace Prisma {
     not?: NestedEnumRecurringFrequencyFilter<$PrismaModel> | $Enums.RecurringFrequency
   }
 
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
   export type RecurringInvoiceCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -17999,15 +18040,17 @@ export namespace Prisma {
     startAt?: SortOrder
     nextRunAt?: SortOrder
     endAt?: SortOrder
-    isActive?: SortOrder
-    lastRunAt?: SortOrder
+    maxOccurrences?: SortOrder
     occurrenceCount?: SortOrder
+    lastRunAt?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type RecurringInvoiceAvgOrderByAggregateInput = {
     interval?: SortOrder
+    maxOccurrences?: SortOrder
     occurrenceCount?: SortOrder
   }
 
@@ -18021,9 +18064,10 @@ export namespace Prisma {
     startAt?: SortOrder
     nextRunAt?: SortOrder
     endAt?: SortOrder
-    isActive?: SortOrder
-    lastRunAt?: SortOrder
+    maxOccurrences?: SortOrder
     occurrenceCount?: SortOrder
+    lastRunAt?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -18038,15 +18082,17 @@ export namespace Prisma {
     startAt?: SortOrder
     nextRunAt?: SortOrder
     endAt?: SortOrder
-    isActive?: SortOrder
-    lastRunAt?: SortOrder
+    maxOccurrences?: SortOrder
     occurrenceCount?: SortOrder
+    lastRunAt?: SortOrder
+    isActive?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type RecurringInvoiceSumOrderByAggregateInput = {
     interval?: SortOrder
+    maxOccurrences?: SortOrder
     occurrenceCount?: SortOrder
   }
 
@@ -18058,6 +18104,22 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumRecurringFrequencyFilter<$PrismaModel>
     _max?: NestedEnumRecurringFrequencyFilter<$PrismaModel>
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type PaymentCreateNestedManyWithoutUserInput = {
@@ -18918,6 +18980,14 @@ export namespace Prisma {
     set?: $Enums.RecurringFrequency
   }
 
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type UserUpdateOneRequiredWithoutRecurringNestedInput = {
     create?: XOR<UserCreateWithoutRecurringInput, UserUncheckedCreateWithoutRecurringInput>
     connectOrCreate?: UserCreateOrConnectWithoutRecurringInput
@@ -19194,6 +19264,33 @@ export namespace Prisma {
     _max?: NestedEnumRecurringFrequencyFilter<$PrismaModel>
   }
 
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type PaymentCreateWithoutUserInput = {
     id?: string
     amount: Decimal | DecimalJsLike | number | string
@@ -19409,14 +19506,15 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateWithoutUserInput = {
     id?: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     client: ClientCreateNestedOneWithoutRecurringInput
@@ -19427,14 +19525,15 @@ export namespace Prisma {
     id?: string
     clientId: string
     templateInvoiceId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -19670,9 +19769,10 @@ export namespace Prisma {
     startAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     nextRunAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     endAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
-    isActive?: BoolFilter<"RecurringInvoice"> | boolean
-    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    maxOccurrences?: IntNullableFilter<"RecurringInvoice"> | number | null
     occurrenceCount?: IntFilter<"RecurringInvoice"> | number
+    lastRunAt?: DateTimeNullableFilter<"RecurringInvoice"> | Date | string | null
+    isActive?: BoolFilter<"RecurringInvoice"> | boolean
     createdAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
     updatedAt?: DateTimeFilter<"RecurringInvoice"> | Date | string
   }
@@ -19850,14 +19950,15 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateWithoutClientInput = {
     id?: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRecurringInput
@@ -19868,14 +19969,15 @@ export namespace Prisma {
     id?: string
     userId: string
     templateInvoiceId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20463,14 +20565,15 @@ export namespace Prisma {
 
   export type RecurringInvoiceCreateWithoutTemplateInvoiceInput = {
     id?: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutRecurringInput
@@ -20481,14 +20584,15 @@ export namespace Prisma {
     id?: string
     userId: string
     clientId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21448,14 +21552,15 @@ export namespace Prisma {
     id?: string
     clientId: string
     templateInvoiceId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21666,9 +21771,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     client?: ClientUpdateOneRequiredWithoutRecurringNestedInput
@@ -21684,9 +21790,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21700,9 +21807,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21729,14 +21837,15 @@ export namespace Prisma {
     id?: string
     userId: string
     templateInvoiceId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -21810,9 +21919,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRecurringNestedInput
@@ -21828,9 +21938,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21844,9 +21955,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -21989,14 +22101,15 @@ export namespace Prisma {
     id?: string
     userId: string
     clientId: string
-    frequency?: $Enums.RecurringFrequency
+    frequency: $Enums.RecurringFrequency
     interval?: number
     startAt: Date | string
     nextRunAt: Date | string
     endAt?: Date | string | null
-    isActive?: boolean
-    lastRunAt?: Date | string | null
+    maxOccurrences?: number | null
     occurrenceCount?: number
+    lastRunAt?: Date | string | null
+    isActive?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -22104,9 +22217,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutRecurringNestedInput
@@ -22122,9 +22236,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22138,9 +22253,10 @@ export namespace Prisma {
     startAt?: DateTimeFieldUpdateOperationsInput | Date | string
     nextRunAt?: DateTimeFieldUpdateOperationsInput | Date | string
     endAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
-    isActive?: BoolFieldUpdateOperationsInput | boolean
-    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    maxOccurrences?: NullableIntFieldUpdateOperationsInput | number | null
     occurrenceCount?: IntFieldUpdateOperationsInput | number
+    lastRunAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    isActive?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

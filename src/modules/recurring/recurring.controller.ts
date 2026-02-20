@@ -2,38 +2,24 @@ import { Request, Response } from "express";
 import { RecurringService } from "./recurring.service.js";
 
 export class RecurringController {
-  constructor(private recurringService: RecurringService) {}
-
-  create = async (req: Request, res: Response) => {
-    const userId = (req as any).user?.id;
-    const data = await this.recurringService.create(userId, req.body);
-    return res.status(201).json({ message: "Recurring created", data });
-  };
+  constructor(private service: RecurringService) {}
 
   list = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
-    const result = await this.recurringService.list(userId, req.query as any);
-    return res.json({ message: "OK", ...result });
+    const data = await this.service.list(userId, req.query as any);
+    return res.json({ message: "OK", data });
   };
 
-  update = async (req: Request, res: Response) => {
+  create = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
-    const data = await this.recurringService.update(
-      userId,
-      req.params.id,
-      req.body,
-    );
-    return res.json({ message: "Recurring updated", data });
+    const created = await this.service.create(userId, req.body);
+    return res.status(201).json({ message: "Created", data: created });
   };
 
   toggle = async (req: Request, res: Response) => {
     const userId = (req as any).user?.id;
-    const isActive = Boolean((req.body as any)?.isActive);
-    const data = await this.recurringService.toggle(
-      userId,
-      req.params.id,
-      isActive,
-    );
-    return res.json({ message: "Recurring updated", data });
+    const id = req.params.id;
+    const updated = await this.service.toggle(userId, id, req.body.isActive);
+    return res.json({ message: "OK", data: updated });
   };
 }

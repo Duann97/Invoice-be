@@ -1,23 +1,18 @@
-import { IsIn, IsOptional, IsString } from "class-validator";
+import { IsIn, IsInt, IsOptional, Min } from "class-validator";
 
 export class ListRecurringDTO {
   @IsOptional()
-  @IsString()
-  page?: string;
+  @IsInt()
+  @Min(1)
+  page?: number;
 
   @IsOptional()
-  @IsString()
-  limit?: string;
+  @IsInt()
+  @Min(1)
+  limit?: number;
 
+  // "all" | "active" | "inactive"
   @IsOptional()
-  @IsIn(["true", "false"])
-  isActive?: "true" | "false";
-
-  @IsOptional()
-  @IsString()
-  clientId?: string;
-
-  @IsOptional()
-  @IsString()
-  q?: string;
+  @IsIn(["all", "active", "inactive"])
+  active?: "all" | "active" | "inactive";
 }

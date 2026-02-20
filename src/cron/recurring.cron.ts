@@ -1,31 +1,23 @@
+import cron from "node-cron";
 import { PrismaClient } from "../generated/prisma/client.js";
 import { RecurringService } from "../modules/recurring/recurring.service.js";
 
 export class RecurringCron {
-  private timer: NodeJS.Timeout | null = null;
+  private service: RecurringService;
 
-  constructor(private prisma: PrismaClient) {}
-
-  start() {
-    const service = new RecurringService(this.prisma);
-
-    // run once at boot
-    service.runDue().catch(() => {});
-
-    // run every 60 seconds
-    this.timer = setInterval(async () => {
-      try {
-        await service.runDue();
-      } catch (e) {
-        // jangan crash app
-      }
-    }, 60_000);
-
-    console.log("[cron] recurring cron started (every 60s)");
+  constructor(private prisma: PrismaClient) {
+    this.service = new RecurringService(prisma);
   }
 
-  stop() {
-    if (this.timer) clearInterval(this.timer);
-    this.timer = null;
+  start() {
+    // tiap menit (buat test). Nanti production bisa tiap 5 menit
+    cron.schedule("* * * * *", async () => {
+      try {
+        const r = await this.service.runDueRules();
+        console.log("[recurring-cron] processed:", r.processed);
+      } catch (e) {
+        console.error("[recurring-cron] error:", e);
+      }
+    });
   }
 }
