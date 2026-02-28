@@ -17,7 +17,6 @@ export class JwtMiddleware {
       try {
         const payload = jwt.verify(token, secretKey);
 
-        (req as any).user = payload;
         res.locals.user = payload;
 
         return next();
